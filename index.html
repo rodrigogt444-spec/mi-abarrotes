@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>Mi Abarrotes - Punto de Venta</title>
-<!-- Librería robusta para escanear en cualquier Android -->
+<!-- Librería del escáner -->
 <script src="https://unpkg.com/html5-qrcode"></script>
 <style>
   * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Arial, sans-serif; -webkit-tap-highlight-color: transparent; }
@@ -52,12 +52,10 @@
   .venta-item { padding: 8px; border-bottom: 1px solid #f0f0f0; font-size: 0.85rem; }
   .venta-item .hora { color: #888; font-size: 0.75rem; }
 
-  /* --- ESTILOS DEL NUEVO ESCÁNER --- */
+  /* Estilos del Escáner */
   .scanner-modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.95); z-index: 2000; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 20px; }
   .scanner-container { width: 100%; max-width: 400px; background: #fff; border-radius: 12px; overflow: hidden; }
   #reader { width: 100%; }
-  
-  /* El botón de cerrar siempre estará por encima de todo */
   .scanner-close-top { position: absolute; top: 20px; right: 20px; padding: 12px 24px; background: #d32f2f; color: white; border: none; border-radius: 30px; font-weight: bold; font-size: 1rem; z-index: 9999; box-shadow: 0 4px 10px rgba(0,0,0,0.5); cursor: pointer; }
   .scanner-status { color: white; margin-top: 15px; font-size: 1rem; text-align: center; font-weight: bold; }
 </style>
@@ -120,22 +118,18 @@
 
 <!-- MODAL DEL ESCÁNER -->
 <div id="modalEscaner" class="scanner-modal oculto">
-  <!-- Este botón es infalible -->
   <button class="scanner-close-top" onclick="cerrarEscaner()">✖ CERRAR</button>
-  
   <div class="scanner-container">
-    <!-- Aquí la librería inyectará la cámara -->
     <div id="reader"></div>
   </div>
-  
   <div class="scanner-status" id="scannerStatus">Iniciando cámara...</div>
 </div>
 
 <div class="toast" id="toast"></div>
 
 <script>
-let productos = JSON.parse(localStorage.getItem('prod_abarrotes_v3') || '[]');
-let ventasHoy = JSON.parse(localStorage.getItem('ventas_abarrotes_v3') || '[]');
+let productos = JSON.parse(localStorage.getItem('prod_abarrotes_v4') || '[]');
+let ventasHoy = JSON.parse(localStorage.getItem('ventas_abarrotes_v4') || '[]');
 let carrito = [];
 let modoEscaner = 'venta';
 let html5QrCode = null;
@@ -148,8 +142,8 @@ if (productos.length === 0) {
 const $ = id => document.getElementById(id);
 const dinero = n => '$' + n.toFixed(2);
 function guardar() {
-  localStorage.setItem('prod_abarrotes_v3', JSON.stringify(productos));
-  localStorage.setItem('ventas_abarrotes_v3', JSON.stringify(ventasHoy));
+  localStorage.setItem('prod_abarrotes_v4', JSON.stringify(productos));
+  localStorage.setItem('ventas_abarrotes_v4', JSON.stringify(ventasHoy));
 }
 function toast(msg) {
   const t = $('toast'); t.textContent = msg; t.classList.add('show');
@@ -283,58 +277,55 @@ function cerrarDia() {
   ventasHoy = []; guardar(); renderVentas(); totalDelDia(); toast('📊 Día cerrado');
 }
 
-// --- LÓGICA CON HTML5-QRCODE ---
+// --- LÓGICA DE CÁMARA MEJORADA (Baja resolución para encendido rápido) ---
 async function abrirEscaner(modo) {
   modoEscaner = modo;
   $('modalEscaner').classList.remove('oculto');
   $('scannerStatus').textContent = 'Iniciando cámara...';
 
-  // Instanciar la librería
   html5QrCode = new Html5Qrcode("reader");
 
   try {
-    // Pedir la cámara trasera
+    // Configuración de baja resolución para forzar encendido rápido en Android
     await html5QrCode.start(
-      { facingMode: "environment" },
+      { 
+        facingMode: "environment",
+        width: { ideal: 640 },
+        height: { ideal: 480 }
+      },
       {
         fps: 10,
-        qrbox: { width: 250, height: 150 } // Cuadro de escaneo
+        qrbox: { width: 250, height: 150 } 
       },
       (decodedText) => {
-        // Éxito: se leyó un código
         procesarCodigoEscaneado(decodedText);
       },
       (errorMessage) => {
-        // Es normal que falle mientras enfoca, ignoramos el error
+        // Ignorar errores de frames
       }
     );
-    $('scannerStatus').textContent = 'Apunta al código';
+    $('scannerStatus').textContent = 'Apunta al código de barras';
   } catch (err) {
     console.error(err);
-    $('scannerStatus').innerHTML = '<span style="color:#ff5252">❌ Error al iniciar cámara.</span><br><small>Revisa los permisos.</small>';
+    $('scannerStatus').innerHTML = '<span style="color:#ff5252">❌ La cámara no encendió.</span><br><small>Ve al candado de Chrome y permite la cámara.</small>';
   }
 }
 
 function procesarCodigoEscaneado(codigo) {
-  // 1. Detener la cámara inmediatamente
   if (html5QrCode) {
     html5QrCode.stop().then(() => {
       html5QrCode.clear();
     }).catch(err => console.log(err));
   }
-
-  // 2. Cerrar el modal
   $('modalEscaner').classList.add('oculto');
 
-  // 3. Procesar el producto
   if (modoEscaner === 'registro') {
     $('nuevoCodigo').value = codigo;
     toast('📷 Código: ' + codigo);
   } else if (modoEscaner === 'venta') {
     const producto = productos.find(p => p.codigo === codigo);
-    if (producto) { 
-      agregarAlCarrito(producto.id); 
-    } else { 
+    if (producto) { agregarAlCarrito(producto.id); } 
+    else { 
       if (confirm(`Código ${codigo} no registrado.\n¿Registrarlo ahora?`)) { 
         document.querySelector('[data-tab="productos"]').click(); 
         $('nuevoCodigo').value = codigo; 
@@ -345,14 +336,12 @@ function procesarCodigoEscaneado(codigo) {
 }
 
 function cerrarEscaner() {
-  // Detener la cámara de forma segura
   if (html5QrCode) {
     html5QrCode.stop().then(() => {
       html5QrCode.clear();
       html5QrCode = null;
     }).catch(err => console.log("Error al cerrar", err));
   }
-  // Ocultar modal de inmediato
   $('modalEscaner').classList.add('oculto');
 }
 
