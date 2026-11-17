@@ -5,60 +5,171 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>Mi Abarrotes - Punto de Venta</title>
 <style>
-  * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Arial, sans-serif; -webkit-tap-highlight-color: transparent; }
-  body { background: #f0f2f5; color: #333; padding: 12px; padding-bottom: 80px; }
-  .app { max-width: 1100px; margin: 0 auto; }
-  header { background: linear-gradient(135deg, #2e7d32, #66bb6a); color: white; padding: 16px; border-radius: 12px; display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; box-shadow: 0 3px 8px rgba(0,0,0,0.15); }
-  header h1 { font-size: 1.3rem; }
-  header .fecha { font-size: 0.8rem; opacity: 0.9; }
-  .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap');
+
+  :root {
+    --primary: #4caf50;
+    --primary-dark: #2e7d32;
+    --danger: #ef5350;
+    --warning: #ff9800;
+    --bg-color: #e8f5e9;
+    --card-bg: rgba(255, 255, 255, 0.95);
+    --text-main: #2c3e50;
+    --text-light: #7f8c8d;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Poppins', sans-serif; -webkit-tap-highlight-color: transparent; }
+  
+  body { 
+    background: linear-gradient(135deg, #a8e063 0%, #56ab2f 100%);
+    color: var(--text-main); 
+    min-height: 100vh;
+    padding: 12px; 
+    padding-bottom: 80px; 
+  }
+  
+  .app { max-width: 1100px; margin: 0 auto; display: none; } /* Oculto hasta que haga login */
+
+  /* --- LOGIN --- */
+  #loginScreen {
+    position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+    background: linear-gradient(135deg, #2e7d32 0%, #1b5e20 100%);
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    z-index: 5000; padding: 20px;
+  }
+  .login-card {
+    background: white; padding: 30px 20px; border-radius: 20px;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.3); width: 100%; max-width: 350px; text-align: center;
+    animation: slideUp 0.5s ease;
+  }
+  @keyframes slideUp { from { transform: translateY(30px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+  
+  .login-card h1 { color: var(--primary-dark); margin-bottom: 5px; font-size: 1.8rem; }
+  .login-card p { color: var(--text-light); font-size: 0.9rem; margin-bottom: 20px; }
+  
+  .login-input {
+    width: 100%; padding: 15px; font-size: 1.2rem; text-align: center; letter-spacing: 5px;
+    border: 2px solid #e0e0e0; border-radius: 12px; outline: none; margin-bottom: 15px; transition: border 0.3s;
+  }
+  .login-input:focus { border-color: var(--primary); }
+  
+  .btn-login {
+    width: 100%; padding: 15px; background: var(--primary); color: white; border: none;
+    border-radius: 12px; font-size: 1.1rem; font-weight: 600; cursor: pointer; transition: transform 0.2s;
+  }
+  .btn-login:active { transform: scale(0.97); }
+
+  /* --- DASHBOARD --- */
+  header {
+    background: linear-gradient(135deg, var(--primary), #81c784);
+    color: white; padding: 20px; border-radius: 16px;
+    display: flex; justify-content: space-between; align-items: center;
+    margin-bottom: 16px; box-shadow: 0 4px 15px rgba(46, 125, 50, 0.3);
+  }
+  header h1 { font-size: 1.4rem; font-weight: 700; }
+  header .fecha { font-size: 0.85rem; opacity: 0.9; font-weight: 300; margin-top: 4px; }
+  header .ventas-hoy { background: rgba(255,255,255,0.2); padding: 8px 12px; border-radius: 10px; font-size: 0.9rem; font-weight: 600; }
+
+  .tabs { display: flex; gap: 10px; margin-bottom: 15px; }
+  .tab {
+    flex: 1; padding: 12px; text-align: center; border-radius: 12px;
+    background: var(--card-bg); cursor: pointer; font-size: 0.9rem; font-weight: 600; color: var(--text-light);
+    box-shadow: 0 2px 5px rgba(0,0,0,0.05); transition: all 0.3s ease;
+  }
+  .tab.active { background: var(--primary); color: white; box-shadow: 0 4px 10px rgba(76, 175, 80, 0.3); }
+  
+  .oculto { display: none !important; }
+  
+  .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
   @media (max-width: 700px) { .grid { grid-template-columns: 1fr; } }
-  .card { background: white; border-radius: 12px; padding: 14px; box-shadow: 0 2px 6px rgba(0,0,0,0.08); }
-  .card h2 { font-size: 1rem; margin-bottom: 10px; color: #2e7d32; border-bottom: 2px solid #e8f5e9; padding-bottom: 6px; display: flex; justify-content: space-between; align-items: center;}
-  input, button { font-size: 0.95rem; border-radius: 8px; }
-  input { width: 100%; padding: 10px; border: 2px solid #e0e0e0; outline: none; transition: border 0.2s; }
-  input:focus { border-color: #66bb6a; }
-  button { padding: 10px 14px; border: none; cursor: pointer; font-weight: 600; transition: transform 0.1s, opacity 0.2s; }
+  
+  .card {
+    background: var(--card-bg); border-radius: 16px; padding: 16px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.05); backdrop-filter: blur(10px);
+  }
+  .card h2 { font-size: 1.1rem; margin-bottom: 12px; color: var(--text-main); display: flex; justify-content: space-between; align-items: center;}
+  
+  input[type="text"], input[type="number"] {
+    width: 100%; padding: 14px; border: 2px solid #f0f0f0; border-radius: 12px; outline: none;
+    font-size: 1rem; background: #fafafa; transition: all 0.3s;
+  }
+  input:focus { border-color: var(--primary); background: white; }
+  
+  button { padding: 14px; border: none; cursor: pointer; font-weight: 600; border-radius: 12px; transition: all 0.2s; font-size: 0.95rem; }
   button:active { transform: scale(0.97); }
-  .btn-primary { background: #2e7d32; color: white; }
-  .btn-danger { background: #d32f2f; color: white; }
-  .btn-warning { background: #f57c00; color: white; }
-  .btn-full { width: 100%; margin-top: 8px; }
   
-  .productos-lista { max-height: 340px; overflow-y: auto; }
-  .producto-item { display: flex; justify-content: space-between; align-items: center; padding: 10px; border-bottom: 1px solid #eee; cursor: pointer; border-radius: 6px; }
-  .producto-item:hover { background: #e8f5e9; }
+  .btn-primary { background: var(--primary); color: white; box-shadow: 0 4px 10px rgba(76, 175, 80, 0.3); }
+  .btn-danger { background: var(--danger); color: white; box-shadow: 0 4px 10px rgba(239, 83, 80, 0.3); }
+  .btn-warning { background: var(--warning); color: white; box-shadow: 0 4px 10px rgba(255, 152, 0, 0.3); }
+  .btn-full { width: 100%; margin-top: 10px; }
+
+  /* Listas */
+  .productos-lista { max-height: 350px; overflow-y: auto; padding-right: 5px; }
+  .producto-item {
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 12px; border-bottom: 1px solid #f5f5f5; cursor: pointer; border-radius: 10px; transition: background 0.2s;
+  }
+  .producto-item:hover { background: #f1f8e9; }
   .producto-item .info { flex: 1; }
-  .producto-item .nombre { font-weight: 600; font-size: 0.95rem; }
-  .producto-item .precio { color: #2e7d32; font-weight: bold; }
-  .producto-item .stock { font-size: 0.75rem; color: #888; }
-  .producto-item .stock.bajo { color: #d32f2f; font-weight: bold; }
+  .producto-item .nombre { font-weight: 600; font-size: 0.95rem; color: var(--text-main); }
+  .producto-item .precio { color: var(--primary-dark); font-weight: 700; font-size: 1.05rem; }
+  .producto-item .stock { font-size: 0.75rem; color: var(--text-light); margin-top: 2px; }
+  .producto-item .stock.bajo { color: var(--danger); font-weight: 700; }
+
+  .carrito-lista { max-height: 300px; overflow-y: auto; }
+  .carrito-item { display: flex; justify-content: space-between; align-items: center; padding: 10px 0; border-bottom: 1px solid #f5f5f5; }
+  .carrito-item .cant { display: flex; align-items: center; gap: 8px; background: #f5f5f5; padding: 4px; border-radius: 8px; }
+  .carrito-item .cant button { width: 28px; height: 28px; padding: 0; background: white; border-radius: 6px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
   
-  .carrito-lista { max-height: 280px; overflow-y: auto; }
-  .carrito-item { display: flex; justify-content: space-between; align-items: center; padding: 8px; border-bottom: 1px solid #f0f0f0; font-size: 0.9rem; }
-  .carrito-item .cant { display: flex; align-items: center; gap: 6px; }
-  .carrito-item .cant button { width: 28px; height: 28px; padding: 0; border-radius: 6px; background: #e0e0e0; font-weight: bold; font-size: 1.1rem; }
-  .total-box { background: #2e7d32; color: white; padding: 12px; border-radius: 10px; margin-top: 10px; display: flex; justify-content: space-between; align-items: center; font-size: 1.1rem; font-weight: bold; }
+  .total-box {
+    background: var(--primary-dark); color: white; padding: 16px; border-radius: 12px;
+    margin-top: 15px; display: flex; justify-content: space-between; align-items: center;
+    font-size: 1.2rem; font-weight: 700; box-shadow: 0 4px 15px rgba(46, 125, 50, 0.3);
+  }
   
-  .vacio { text-align: center; color: #aaa; padding: 20px; font-size: 0.9rem; }
-  .tabs { display: flex; gap: 6px; margin-bottom: 10px; }
-  .tab { flex: 1; padding: 8px; text-align: center; border-radius: 8px; background: #e0e0e0; cursor: pointer; font-size: 0.85rem; font-weight: 600; }
-  .tab.active { background: #2e7d32; color: white; }
-  .oculto { display: none; }
-  .toast { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); background: #323232; color: white; padding: 12px 20px; border-radius: 30px; font-size: 0.9rem; opacity: 0; transition: opacity 0.3s; z-index: 1000; pointer-events: none; }
-  .toast.show { opacity: 1; }
+  .vacio { text-align: center; color: var(--text-light); padding: 30px 20px; font-size: 0.9rem; }
   
-  .form-nuevo { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+  .form-nuevo { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 10px;}
   .form-nuevo .full { grid-column: span 2; }
-  .venta-item { padding: 8px; border-bottom: 1px solid #f0f0f0; font-size: 0.85rem; }
-  .venta-item .hora { color: #888; font-size: 0.75rem; }
+
+  .venta-item { padding: 12px 0; border-bottom: 1px solid #f5f5f5; }
+  .venta-item:last-child { border-bottom: none; }
+  .venta-item .header-venta { display: flex; justify-content: space-between; font-weight: 600; margin-bottom: 5px; }
+  .venta-item .hora { color: var(--text-light); font-size: 0.8rem; font-weight: 400; }
+  .venta-item .detalle { color: var(--text-light); font-size: 0.85rem; }
+
+  .toast {
+    position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%);
+    background: #323232; color: white; padding: 12px 24px; border-radius: 30px;
+    font-size: 0.9rem; opacity: 0; transition: opacity 0.3s; z-index: 6000; pointer-events: none;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+  }
+  .toast.show { opacity: 1; }
 </style>
 </head>
 <body>
-<div class="app">
+
+<!-- PANTALLA DE LOGIN -->
+<div id="loginScreen">
+  <div class="login-card">
+    <h1>🏪 Mi Abarrotes</h1>
+    <p>Ingresa tu PIN de administrador</p>
+    <input type="password" id="inputPin" class="login-input" placeholder="••••" maxlength="4" inputmode="numeric" autocomplete="off">
+    <button class="btn-login" onclick="verificarLogin()">Entrar al Sistema</button>
+  </div>
+</div>
+
+<!-- APP PRINCIPAL -->
+<div class="app" id="appPrincipal">
   <header>
-    <div><h1>🏪 Mi Abarrotes</h1><div class="fecha" id="fechaHoy"></div></div>
-    <div style="text-align:right; font-size:0.8rem;"><div id="totalDia">Ventas hoy: $0.00</div></div>
+    <div>
+      <h1>🏪 Mi Abarrotes</h1>
+      <div class="fecha" id="fechaHoy"></div>
+    </div>
+    <div style="text-align:right;">
+      <div class="ventas-hoy" id="totalDia">Ventas hoy: $0.00</div>
+      <button onclick="cerrarSesion()" style="background:rgba(255,255,255,0.2); color:white; padding:6px 10px; margin-top:8px; font-size:0.75rem; border-radius:8px;">Cerrar Sesión</button>
+    </div>
   </header>
 
   <div class="tabs">
@@ -71,11 +182,12 @@
     <div class="card">
       <h2>Productos</h2>
       <input type="text" id="buscador" placeholder="🔍 Buscar producto...">
-      <div class="productos-lista" id="listaProductos" style="margin-top:8px;"></div>
+      <div class="productos-lista" id="listaProductos" style="margin-top:12px;"></div>
     </div>
+
     <div class="card">
       <h2>Carrito de venta</h2>
-      <div class="carrito-lista" id="carritoLista"><div class="vacio">Agrega productos</div></div>
+      <div class="carrito-lista" id="carritoLista"><div class="vacio">Agrega productos para comenzar</div></div>
       <div class="total-box"><span>TOTAL</span><span id="totalCarrito">$0.00</span></div>
       <button class="btn-primary btn-full" onclick="cobrar()">💵 COBRAR</button>
       <button class="btn-danger btn-full" onclick="vaciarCarrito()">🗑️ Cancelar venta</button>
@@ -83,19 +195,18 @@
   </div>
 
   <div id="tab-productos" class="oculto">
-    <div class="card" style="margin-bottom:12px;">
+    <div class="card" style="margin-bottom:16px;">
       <h2>➕ Agregar producto</h2>
       <div class="form-nuevo">
-        <input type="text" id="nuevoNombre" placeholder="Nombre del producto">
+        <input type="text" id="nuevoNombre" class="full" placeholder="Nombre del producto (ej. Sabritas)">
         <input type="number" id="nuevoPrecio" placeholder="Precio $" step="0.01" min="0">
         <input type="number" id="nuevoStock" placeholder="Stock" min="0" value="10">
-        <input type="text" id="nuevoCodigo" placeholder="Código (opcional)">
         <button class="btn-primary full" onclick="agregarProducto()">Guardar Producto</button>
       </div>
     </div>
     <div class="card">
       <h2>Inventario</h2>
-      <input type="text" id="buscadorInv" placeholder="🔍 Buscar..." style="margin-bottom:10px;">
+      <input type="text" id="buscadorInv" placeholder="🔍 Buscar..." style="margin-bottom:12px;">
       <div class="productos-lista" id="listaInventario"></div>
     </div>
   </div>
@@ -103,8 +214,8 @@
   <div id="tab-historial" class="oculto">
     <div class="card">
       <h2>🧾 Ventas del día</h2>
-      <div id="listaVentas"></div>
-      <button class="btn-warning btn-full" onclick="cerrarDia()">📊 Cerrar día</button>
+      <div id="listaVentas" style="max-height:400px; overflow-y:auto;"></div>
+      <button class="btn-warning btn-full" style="margin-top:20px;" onclick="cerrarDia()">📊 Cerrar día y reiniciar</button>
     </div>
   </div>
 </div>
@@ -112,18 +223,18 @@
 <div class="toast" id="toast"></div>
 
 <script>
-// Variables globales
-let productos = JSON.parse(localStorage.getItem('prod_abarrotes_final') || '[]');
-let ventasHoy = JSON.parse(localStorage.getItem('ventas_abarrotes_final') || '[]');
+// --- CONFIGURACIÓN DE SEGURIDAD ---
+const PIN_ADMIN = "1234"; // ¡Cambia este número por el que tú quieras!
+
+let productos = JSON.parse(localStorage.getItem('prod_abarrotes_v5') || '[]');
+let ventasHoy = JSON.parse(localStorage.getItem('ventas_abarrotes_v5') || '[]');
 let carrito = [];
 
-// Productos de ejemplo si está vacío
 if (productos.length === 0) {
   productos = [
     { id: 1, nombre: 'Refresco 600ml', precio: 18, stock: 20 },
     { id: 2, nombre: 'Sabritas 45g', precio: 16, stock: 15 },
-    { id: 3, nombre: 'Pan blanco', precio: 42, stock: 8 },
-    { id: 4, nombre: 'Leche 1L', precio: 26, stock: 12 }
+    { id: 3, nombre: 'Pan blanco', precio: 42, stock: 8 }
   ];
   guardar();
 }
@@ -132,13 +243,48 @@ const $ = id => document.getElementById(id);
 const dinero = n => '$' + n.toFixed(2);
 
 function guardar() {
-  localStorage.setItem('prod_abarrotes_final', JSON.stringify(productos));
-  localStorage.setItem('ventas_abarrotes_final', JSON.stringify(ventasHoy));
+  localStorage.setItem('prod_abarrotes_v5', JSON.stringify(productos));
+  localStorage.setItem('ventas_abarrotes_v5', JSON.stringify(ventasHoy));
 }
 
 function toast(msg) {
   const t = $('toast'); t.textContent = msg; t.classList.add('show');
   setTimeout(() => t.classList.remove('show'), 2000);
+}
+
+// --- LÓGICA DE LOGIN ---
+function verificarLogin() {
+  const pin = $('inputPin').value;
+  if (pin === PIN_ADMIN) {
+    $('loginScreen').style.display = 'none';
+    $('appPrincipal').style.display = 'block';
+    $('inputPin').value = '';
+    iniciarApp();
+  } else {
+    toast('❌ PIN incorrecto');
+    $('inputPin').value = '';
+  }
+}
+
+function cerrarSesion() {
+  $('loginScreen').style.display = 'flex';
+  $('appPrincipal').style.display = 'none';
+  $('inputPin').value = '';
+}
+
+// Permitir entrar con "Enter"
+$('inputPin').addEventListener('keypress', function (e) {
+  if (e.key === 'Enter') verificarLogin();
+});
+
+// --- LÓGICA DE LA APP ---
+function iniciarApp() {
+  actualizarFecha();
+  renderProductos();
+  renderCarrito();
+  renderInventario();
+  renderVentas();
+  totalDelDia();
 }
 
 function actualizarFecha() {
@@ -159,7 +305,10 @@ function renderProductos(filtro = '') {
   if (lista.length === 0) { cont.innerHTML = '<div class="vacio">Sin productos</div>'; return; }
   cont.innerHTML = lista.map(p => `
     <div class="producto-item" onclick="agregarAlCarrito(${p.id})">
-      <div class="info"><div class="nombre">${p.nombre}</div><div class="stock ${p.stock <= 3 ? 'bajo' : ''}">Stock: ${p.stock}</div></div>
+      <div class="info">
+        <div class="nombre">${p.nombre}</div>
+        <div class="stock ${p.stock <= 3 ? 'bajo' : ''}">Stock: ${p.stock} ${p.stock <= 3 ? '⚠️' : ''}</div>
+      </div>
       <div class="precio">${dinero(p.precio)}</div>
     </div>`).join('');
 }
@@ -187,37 +336,40 @@ function cambiarCantidad(id, delta) {
 
 function renderCarrito() {
   const cont = $('carritoLista');
-  if (carrito.length === 0) { cont.innerHTML = '<div class="vacio">Agrega productos</div>'; $('totalCarrito').textContent = '$0.00'; return; }
+  if (carrito.length === 0) { cont.innerHTML = '<div class="vacio">Agrega productos para comenzar</div>'; $('totalCarrito').textContent = '$0.00'; return; }
   cont.innerHTML = carrito.map(i => `
     <div class="carrito-item">
-      <div style="flex:1;"><div style="font-weight:600;">${i.nombre}</div><div style="font-size:0.75rem;color:#888;">${dinero(i.precio)} c/u</div></div>
-      <div class="cant"><button onclick="cambiarCantidad(${i.id}, -1)">−</button><span style="min-width:20px;text-align:center;">${i.cant}</span><button onclick="cambiarCantidad(${i.id}, 1)">+</button></div>
-      <div style="width:70px;text-align:right;font-weight:bold;">${dinero(i.precio * i.cant)}</div>
+      <div style="flex:1;">
+        <div style="font-weight:600; font-size:0.95rem;">${i.nombre}</div>
+        <div style="font-size:0.75rem;color:#888;">${dinero(i.precio)} c/u</div>
+      </div>
+      <div class="cant">
+        <button onclick="cambiarCantidad(${i.id}, -1)">−</button>
+        <span style="min-width:20px;text-align:center;font-weight:600;">${i.cant}</span>
+        <button onclick="cambiarCantidad(${i.id}, 1)">+</button>
+      </div>
+      <div style="width:70px;text-align:right;font-weight:700;color:var(--primary-dark);">${dinero(i.precio * i.cant)}</div>
     </div>`).join('');
   $('totalCarrito').textContent = dinero(carrito.reduce((s, i) => s + i.precio * i.cant, 0));
 }
 
 function vaciarCarrito() {
   if (carrito.length === 0) return;
-  if (confirm('¿Cancelar la venta?')) { carrito = []; renderCarrito(); toast('Cancelada'); }
+  if (confirm('¿Cancelar la venta actual?')) { carrito = []; renderCarrito(); toast('Venta cancelada'); }
 }
 
 function cobrar() {
-  if (carrito.length === 0) { toast('Carrito vacío'); return; }
+  if (carrito.length === 0) { toast('El carrito está vacío'); return; }
   const total = carrito.reduce((s, i) => s + i.precio * i.cant, 0);
-  if (!confirm(`¿Confirmar venta?\nTotal: ${dinero(total)}`)) return;
+  if (!confirm(`¿Confirmar cobro?\nTotal: ${dinero(total)}`)) return;
   
   carrito.forEach(i => { const p = productos.find(x => x.id === i.id); if (p) p.stock -= i.cant; });
   ventasHoy.push({ fecha: new Date().toISOString(), items: [...carrito], total });
   
   carrito = []; 
   guardar(); 
-  renderCarrito(); 
-  renderProductos($('buscador').value); 
-  renderInventario(); 
-  renderVentas(); 
-  totalDelDia();
-  toast('🎉 Venta registrada');
+  renderCarrito(); renderProductos($('buscador').value); renderInventario(); renderVentas(); totalDelDia();
+  toast('🎉 Venta registrada con éxito');
 }
 
 function renderInventario(filtro = '') {
@@ -226,10 +378,15 @@ function renderInventario(filtro = '') {
   if (lista.length === 0) { cont.innerHTML = '<div class="vacio">Sin productos</div>'; return; }
   cont.innerHTML = lista.map(p => `
     <div class="producto-item" style="cursor:default;">
-      <div class="info"><div class="nombre">${p.nombre}</div><div class="stock ${p.stock <= 3 ? 'bajo' : ''}">Stock: ${p.stock}</div></div>
-      <div style="display:flex;align-items:center;gap:8px;"><span class="precio">${dinero(p.precio)}</span>
-      <button style="padding:6px;background:#e0e0e0;" onclick="editarProducto(${p.id})">✏️</button>
-      <button style="padding:6px;" class="btn-danger" onclick="eliminarProducto(${p.id})">🗑️</button></div>
+      <div class="info">
+        <div class="nombre">${p.nombre}</div>
+        <div class="stock ${p.stock <= 3 ? 'bajo' : ''}">Stock: ${p.stock} ${p.stock <= 3 ? '⚠️ Bajo' : ''}</div>
+      </div>
+      <div style="display:flex;align-items:center;gap:10px;">
+        <span class="precio">${dinero(p.precio)}</span>
+        <button style="padding:8px;background:#f0f0f0; color:#555;" onclick="editarProducto(${p.id})">✏️</button>
+        <button style="padding:8px;background:#ffebee; color:var(--danger);" onclick="eliminarProducto(${p.id})">🗑️</button>
+      </div>
     </div>`).join('');
 }
 
@@ -238,16 +395,15 @@ function agregarProducto() {
   const precio = parseFloat($('nuevoPrecio').value);
   const stock = parseInt($('nuevoStock').value);
   
-  if (!nombre || isNaN(precio) || isNaN(stock)) { toast('⚠️ Completa los campos'); return; }
+  if (!nombre || isNaN(precio) || isNaN(stock)) { toast('⚠️ Completa todos los campos'); return; }
   
   const nuevoId = productos.length ? Math.max(...productos.map(p => p.id)) + 1 : 1;
   productos.push({ id: nuevoId, nombre, precio, stock });
   
   guardar(); 
   $('nuevoNombre').value = ''; $('nuevoPrecio').value = ''; $('nuevoStock').value = '10';
-  renderProductos(); 
-  renderInventario(); 
-  toast('✅ Producto agregado');
+  renderProductos(); renderInventario(); 
+  toast('✅ Producto guardado');
 }
 
 function editarProducto(id) {
@@ -257,41 +413,62 @@ function editarProducto(id) {
   const stock = parseInt(prompt('Stock:', p.stock)); if (isNaN(stock)) return;
   
   p.nombre = nombre.trim() || p.nombre; p.precio = precio; p.stock = stock;
-  guardar(); 
-  renderProductos($('buscador').value); 
-  renderInventario(); 
-  toast('✏️ Actualizado');
+  guardar(); renderProductos($('buscador').value); renderInventario(); 
+  toast('✏️ Producto actualizado');
 }
 
 function eliminarProducto(id) {
-  if (!confirm('¿Eliminar producto?')) return;
+  if (!confirm('¿Eliminar este producto del inventario?')) return;
   productos = productos.filter(x => x.id !== id); 
   carrito = carrito.filter(i => i.id !== id);
-  guardar(); 
-  renderProductos(); 
-  renderInventario(); 
-  renderCarrito(); 
-  toast('🗑️ Eliminado');
+  guardar(); renderProductos(); renderInventario(); renderCarrito(); 
+  toast('🗑️ Producto eliminado');
 }
 
 function renderVentas() {
   const cont = $('listaVentas');
-  if (ventasHoy.length === 0) { cont.innerHTML = '<div class="vacio">Sin ventas hoy</div>'; return; }
+  if (ventasHoy.length === 0) { cont.innerHTML = '<div class="vacio">Sin ventas registradas hoy</div>'; return; }
   const total = ventasHoy.reduce((s, v) => s + v.total, 0);
+  
   cont.innerHTML = ventasHoy.slice().reverse().map(v => {
     const h = new Date(v.fecha);
     const hora = h.getHours().toString().padStart(2,'0') + ':' + h.getMinutes().toString().padStart(2,'0');
-    return `<div class="venta-item"><div style="display:flex;justify-content:space-between;font-weight:600;"><span class="hora">${hora}</span><span style="color:#2e7d32;">${dinero(v.total)}</span></div><div style="color:#666;">${v.items.map(i => `${i.cant}x ${i.nombre}`).join(', ')}</div></div>`;
-  }).join('') + `<div style="margin-top:12px;padding:10px;background:#e8f5e9;border-radius:8px;display:flex;justify-content:space-between;font-weight:bold;"><span>TOTAL DEL DÍA</span><span style="color:#2e7d32;">${dinero(total)}</span></div>`;
+    return `
+    <div class="venta-item">
+      <div class="header-venta">
+        <span class="hora">🕒 ${hora}</span>
+        <span style="color:var(--primary-dark);">${dinero(v.total)}</span>
+      </div>
+      <div class="detalle">${v.items.map(i => `${i.cant}x ${i.nombre}`).join(', ')}</div>
+    </div>`;
+  }).join('') + `
+    <div style="margin-top:15px;padding:15px;background:#e8f5e9;border-radius:12px;display:flex;justify-content:space-between;font-weight:700;color:var(--primary-dark);font-size:1.1rem;">
+      <span>TOTAL DEL DÍA</span>
+      <span>${dinero(total)}</span>
+    </div>`;
 }
 
 function cerrarDia() {
-  if (ventasHoy.length === 0) { toast('No hay ventas'); return; }
-  if (!confirm('¿Cerrar el día y borrar el historial de ventas?')) return;
-  ventasHoy = []; guardar(); renderVentas(); totalDelDia(); toast('📊 Día cerrado');
+  if (ventasHoy.length === 0) { toast('No hay ventas para cerrar'); return; }
+  
+  // Seguridad extra: Pedir PIN para cerrar el día
+  const pin = prompt("🔒 Ingresa el PIN de administrador para cerrar el día:");
+  if (pin !== PIN_ADMIN) {
+    if (pin !== null) toast('❌ PIN incorrecto. Acción cancelada.');
+    return;
+  }
+
+  const total = ventasHoy.reduce((s, v) => s + v.total, 0);
+  if (!confirm(`¿Cerrar el día?\n\nTotal vendido: ${dinero(total)}\nSe borrará el historial de ventas.`)) return;
+  
+  ventasHoy = []; 
+  guardar(); 
+  renderVentas(); 
+  totalDelDia(); 
+  toast('📊 Día cerrado correctamente');
 }
 
-// Navegación de Pestañas
+// Navegación
 document.querySelectorAll('.tab').forEach(tab => {
   tab.addEventListener('click', () => {
     document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
@@ -304,13 +481,6 @@ document.querySelectorAll('.tab').forEach(tab => {
 $('buscador').addEventListener('input', e => renderProductos(e.target.value));
 $('buscadorInv').addEventListener('input', e => renderInventario(e.target.value));
 
-// Inicializar la app
-actualizarFecha(); 
-renderProductos(); 
-renderCarrito(); 
-renderInventario(); 
-renderVentas(); 
-totalDelDia();
 </script>
 </body>
 </html>
