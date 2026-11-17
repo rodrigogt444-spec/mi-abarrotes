@@ -4,37 +4,22 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>Mi Abarrotes - Punto de Venta</title>
-<!-- Polyfill para navegadores sin soporte nativo (Safari/iOS) -->
 <script type="module" src="https://cdn.jsdelivr.net/npm/@sec-ant/barcode-detector@1.3/dist/es/side-effects.min.js"></script>
 <style>
   * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Arial, sans-serif; -webkit-tap-highlight-color: transparent; }
   body { background: #f0f2f5; color: #333; padding: 12px; padding-bottom: 80px; }
   .app { max-width: 1100px; margin: 0 auto; }
-  header {
-    background: linear-gradient(135deg, #2e7d32, #66bb6a);
-    color: white; padding: 16px; border-radius: 12px;
-    display: flex; justify-content: space-between; align-items: center;
-    margin-bottom: 12px; box-shadow: 0 3px 8px rgba(0,0,0,0.15);
-  }
+  header { background: linear-gradient(135deg, #2e7d32, #66bb6a); color: white; padding: 16px; border-radius: 12px; display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; box-shadow: 0 3px 8px rgba(0,0,0,0.15); }
   header h1 { font-size: 1.3rem; }
   header .fecha { font-size: 0.8rem; opacity: 0.9; }
   .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
   @media (max-width: 700px) { .grid { grid-template-columns: 1fr; } }
-  .card {
-    background: white; border-radius: 12px; padding: 14px;
-    box-shadow: 0 2px 6px rgba(0,0,0,0.08);
-  }
+  .card { background: white; border-radius: 12px; padding: 14px; box-shadow: 0 2px 6px rgba(0,0,0,0.08); }
   .card h2 { font-size: 1rem; margin-bottom: 10px; color: #2e7d32; border-bottom: 2px solid #e8f5e9; padding-bottom: 6px; display: flex; justify-content: space-between; align-items: center;}
   input, button { font-size: 0.95rem; border-radius: 8px; }
-  input {
-    width: 100%; padding: 10px; border: 2px solid #e0e0e0;
-    outline: none; transition: border 0.2s;
-  }
+  input { width: 100%; padding: 10px; border: 2px solid #e0e0e0; outline: none; transition: border 0.2s; }
   input:focus { border-color: #66bb6a; }
-  button {
-    padding: 10px 14px; border: none; cursor: pointer;
-    font-weight: 600; transition: transform 0.1s, opacity 0.2s;
-  }
+  button { padding: 10px 14px; border: none; cursor: pointer; font-weight: 600; transition: transform 0.1s, opacity 0.2s; }
   button:active { transform: scale(0.97); }
   .btn-primary { background: #2e7d32; color: white; }
   .btn-danger { background: #d32f2f; color: white; }
@@ -44,50 +29,25 @@
   .btn-scan { background: #1976d2; color: white; display: flex; align-items: center; justify-content: center; gap: 6px; }
   .row { display: flex; gap: 8px; align-items: center; }
   .row input { flex: 1; }
-
   .productos-lista { max-height: 340px; overflow-y: auto; }
-  .producto-item {
-    display: flex; justify-content: space-between; align-items: center;
-    padding: 10px; border-bottom: 1px solid #eee; cursor: pointer;
-    border-radius: 6px; transition: background 0.15s;
-  }
+  .producto-item { display: flex; justify-content: space-between; align-items: center; padding: 10px; border-bottom: 1px solid #eee; cursor: pointer; border-radius: 6px; transition: background 0.15s; }
   .producto-item:hover { background: #e8f5e9; }
   .producto-item .info { flex: 1; }
   .producto-item .nombre { font-weight: 600; font-size: 0.95rem; }
   .producto-item .precio { color: #2e7d32; font-weight: bold; }
   .producto-item .stock { font-size: 0.75rem; color: #888; }
   .producto-item .stock.bajo { color: #d32f2f; font-weight: bold; }
-
   .carrito-lista { max-height: 280px; overflow-y: auto; }
-  .carrito-item {
-    display: flex; justify-content: space-between; align-items: center;
-    padding: 8px; border-bottom: 1px solid #f0f0f0; font-size: 0.9rem;
-  }
+  .carrito-item { display: flex; justify-content: space-between; align-items: center; padding: 8px; border-bottom: 1px solid #f0f0f0; font-size: 0.9rem; }
   .carrito-item .cant { display: flex; align-items: center; gap: 6px; }
-  .carrito-item .cant button {
-    width: 28px; height: 28px; padding: 0; border-radius: 6px;
-    background: #e0e0e0; font-weight: bold; font-size: 1.1rem;
-  }
-  .total-box {
-    background: #2e7d32; color: white; padding: 12px;
-    border-radius: 10px; margin-top: 10px;
-    display: flex; justify-content: space-between; align-items: center;
-    font-size: 1.1rem; font-weight: bold;
-  }
+  .carrito-item .cant button { width: 28px; height: 28px; padding: 0; border-radius: 6px; background: #e0e0e0; font-weight: bold; font-size: 1.1rem; }
+  .total-box { background: #2e7d32; color: white; padding: 12px; border-radius: 10px; margin-top: 10px; display: flex; justify-content: space-between; align-items: center; font-size: 1.1rem; font-weight: bold; }
   .vacio { text-align: center; color: #aaa; padding: 20px; font-size: 0.9rem; }
   .tabs { display: flex; gap: 6px; margin-bottom: 10px; }
-  .tab {
-    flex: 1; padding: 8px; text-align: center; border-radius: 8px;
-    background: #e0e0e0; cursor: pointer; font-size: 0.85rem; font-weight: 600;
-  }
+  .tab { flex: 1; padding: 8px; text-align: center; border-radius: 8px; background: #e0e0e0; cursor: pointer; font-size: 0.85rem; font-weight: 600; }
   .tab.active { background: #2e7d32; color: white; }
   .oculto { display: none; }
-  .toast {
-    position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%);
-    background: #323232; color: white; padding: 12px 20px;
-    border-radius: 30px; font-size: 0.9rem; opacity: 0; transition: opacity 0.3s;
-    z-index: 1000; pointer-events: none; white-space: nowrap;
-  }
+  .toast { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); background: #323232; color: white; padding: 12px 20px; border-radius: 30px; font-size: 0.9rem; opacity: 0; transition: opacity 0.3s; z-index: 1000; pointer-events: none; white-space: nowrap; }
   .toast.show { opacity: 1; }
   .form-nuevo { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
   .form-nuevo .full { grid-column: span 2; }
@@ -95,51 +55,21 @@
   .venta-item .hora { color: #888; font-size: 0.75rem; }
 
   /* Estilos del Escáner */
-  .scanner-modal {
-    position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-    background: rgba(0,0,0,0.9); z-index: 2000;
-    display: flex; flex-direction: column; align-items: center; justify-content: center;
-  }
-  .scanner-container {
-    position: relative; width: 100%; max-width: 500px; background: #000;
-    border-radius: 12px; overflow: hidden;
-  }
-  #scannerVideo { width: 100%; display: block; }
-  .scanner-overlay {
-    position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-    border: 2px solid rgba(255,255,255,0.3);
-    box-sizing: border-box;
-    pointer-events: none;
-  }
-  .scanner-overlay::after {
-    content: ''; position: absolute; top: 20%; left: 10%; width: 80%; height: 60%;
-    border: 2px dashed #4caf50; border-radius: 8px;
-    animation: scanPulse 2s infinite;
-  }
-  @keyframes scanPulse {
-    0% { opacity: 0.6; }
-    50% { opacity: 1; border-color: #66bb6a; }
-    100% { opacity: 0.6; }
-  }
-  .scanner-close {
-    margin-top: 15px; padding: 10px 24px; background: #d32f2f; color: white;
-    border: none; border-radius: 30px; font-weight: bold; font-size: 1rem;
-  }
-  .scanner-status {
-    color: white; margin-top: 10px; font-size: 0.9rem; text-align: center; padding: 0 20px;
-  }
+  .scanner-modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.95); z-index: 2000; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+  .scanner-container { position: relative; width: 100%; max-width: 500px; background: #000; border-radius: 12px; overflow: hidden; min-height: 250px; display: flex; align-items: center; justify-content: center; }
+  #scannerVideo { width: 100%; height: auto; display: block; }
+  .scanner-overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; }
+  .scanner-overlay::after { content: ''; position: absolute; top: 20%; left: 10%; width: 80%; height: 60%; border: 2px dashed #4caf50; border-radius: 8px; animation: scanPulse 2s infinite; }
+  @keyframes scanPulse { 0% { opacity: 0.6; } 50% { opacity: 1; border-color: #66bb6a; } 100% { opacity: 0.6; } }
+  .scanner-close { margin-top: 15px; padding: 12px 30px; background: #d32f2f; color: white; border: none; border-radius: 30px; font-weight: bold; font-size: 1rem; z-index: 2010; position: relative; box-shadow: 0 4px 10px rgba(0,0,0,0.3); }
+  .scanner-status { color: white; margin-top: 10px; font-size: 0.9rem; text-align: center; padding: 0 20px; min-height: 20px; }
 </style>
 </head>
 <body>
 <div class="app">
   <header>
-    <div>
-      <h1>🏪 Mi Abarrotes</h1>
-      <div class="fecha" id="fechaHoy"></div>
-    </div>
-    <div style="text-align:right; font-size:0.8rem;">
-      <div id="totalDia">Ventas hoy: $0.00</div>
-    </div>
+    <div><h1>🏪 Mi Abarrotes</h1><div class="fecha" id="fechaHoy"></div></div>
+    <div style="text-align:right; font-size:0.8rem;"><div id="totalDia">Ventas hoy: $0.00</div></div>
   </header>
 
   <div class="tabs">
@@ -148,38 +78,30 @@
     <div class="tab" data-tab="historial">📋 Historial</div>
   </div>
 
-  <!-- PESTAÑA VENTAS -->
   <div id="tab-ventas" class="grid">
     <div class="card">
       <h2>Productos <button class="btn-scan" style="padding:4px 10px; font-size:0.75rem;" onclick="abrirEscaner('venta')">📷 Escanear</button></h2>
       <input type="text" id="buscador" placeholder="🔍 Buscar producto...">
       <div class="productos-lista" id="listaProductos" style="margin-top:8px;"></div>
     </div>
-
     <div class="card">
       <h2>Carrito de venta</h2>
-      <div class="carrito-lista" id="carritoLista">
-        <div class="vacio">Agrega productos para comenzar</div>
-      </div>
-      <div class="total-box">
-        <span>TOTAL</span>
-        <span id="totalCarrito">$0.00</span>
-      </div>
+      <div class="carrito-lista" id="carritoLista"><div class="vacio">Agrega productos para comenzar</div></div>
+      <div class="total-box"><span>TOTAL</span><span id="totalCarrito">$0.00</span></div>
       <button class="btn-primary btn-full" onclick="cobrar()">💵 COBRAR</button>
       <button class="btn-danger btn-full" onclick="vaciarCarrito()">🗑️ Cancelar venta</button>
     </div>
   </div>
 
-  <!-- PESTAÑA PRODUCTOS -->
   <div id="tab-productos" class="oculto">
     <div class="card" style="margin-bottom:12px;">
       <h2>➕ Agregar producto</h2>
       <div class="form-nuevo">
-        <input type="text" id="nuevoNombre" placeholder="Nombre (ej. Refresco 600ml)">
+        <input type="text" id="nuevoNombre" placeholder="Nombre">
         <input type="number" id="nuevoPrecio" placeholder="Precio $" step="0.01" min="0">
-        <input type="number" id="nuevoStock" placeholder="Stock inicial" min="0" value="10">
-        <input type="text" id="nuevoCodigo" placeholder="Código de barras (opcional)">
-        <button class="btn-scan full" style="padding:8px;" onclick="abrirEscaner('registro')">📷 Escanear código para registrar</button>
+        <input type="number" id="nuevoStock" placeholder="Stock" min="0" value="10">
+        <input type="text" id="nuevoCodigo" placeholder="Código de barras">
+        <button class="btn-scan full" style="padding:8px;" onclick="abrirEscaner('registro')">📷 Escanear código</button>
         <button class="btn-primary full" onclick="agregarProducto()">Guardar Producto</button>
       </div>
     </div>
@@ -190,48 +112,40 @@
     </div>
   </div>
 
-  <!-- PESTAÑA HISTORIAL -->
   <div id="tab-historial" class="oculto">
     <div class="card">
       <h2>🧾 Ventas del día</h2>
       <div id="listaVentas"></div>
-      <button class="btn-warning btn-full" onclick="cerrarDia()">📊 Cerrar día y reiniciar</button>
+      <button class="btn-warning btn-full" onclick="cerrarDia()">📊 Cerrar día</button>
     </div>
   </div>
 </div>
 
-<!-- MODAL DEL ESCÁNER -->
 <div id="modalEscaner" class="scanner-modal oculto">
   <div class="scanner-container">
-    <video id="scannerVideo" playsinline muted></video>
-    <div class="scanner-overlay"></div>
+    <video id="scannerVideo" playsinline autoplay muted></video>
+    <div class="scanner-overlay" id="overlayEscaneo"></div>
   </div>
-  <div class="scanner-status" id="scannerStatus">Apunta la cámara al código de barras</div>
-  <button class="scanner-close" onclick="cerrarEscaner()">Cerrar</button>
+  <div class="scanner-status" id="scannerStatus">Iniciando...</div>
+  <button class="scanner-close" onclick="cerrarEscaner()">✖ CERRAR</button>
 </div>
 
 <div class="toast" id="toast"></div>
 
 <script>
-// ---------- ESTADO ----------
 let productos = JSON.parse(localStorage.getItem('prod_abarrotes_v2') || '[]');
 let ventasHoy = JSON.parse(localStorage.getItem('ventas_abarrotes_v2') || '[]');
 let carrito = [];
-let modoEscaner = 'venta'; // 'venta' o 'registro'
+let modoEscaner = 'venta';
 let streamCamara = null;
 let detectorCodigo = null;
 let intervaloEscaneo = null;
 
 if (productos.length === 0) {
-  productos = [
-    { id: 1, nombre: 'Refresco 600ml', precio: 18, stock: 20, codigo: '7501055300123' },
-    { id: 2, nombre: 'Sabritas 45g', precio: 16, stock: 15, codigo: '7501011111111' },
-    { id: 3, nombre: 'Pan blanco', precio: 42, stock: 8, codigo: '' },
-  ];
+  productos = [{ id: 1, nombre: 'Refresco 600ml', precio: 18, stock: 20, codigo: '7501055300123' }];
   guardar();
 }
 
-// ---------- UTILIDADES ----------
 const $ = id => document.getElementById(id);
 const dinero = n => '$' + n.toFixed(2);
 function guardar() {
@@ -239,13 +153,10 @@ function guardar() {
   localStorage.setItem('ventas_abarrotes_v2', JSON.stringify(ventasHoy));
 }
 function toast(msg) {
-  const t = $('toast');
-  t.textContent = msg;
-  t.classList.add('show');
+  const t = $('toast'); t.textContent = msg; t.classList.add('show');
   setTimeout(() => t.classList.remove('show'), 2000);
 }
 
-// ---------- FECHA ----------
 function actualizarFecha() {
   const d = new Date();
   const dias = ['Dom','Lun','Mar','Mié','Jue','Vie','Sáb'];
@@ -257,23 +168,17 @@ function totalDelDia() {
   $('totalDia').textContent = 'Ventas hoy: ' + dinero(t);
 }
 
-// ---------- RENDER PRODUCTOS ----------
 function renderProductos(filtro = '') {
   const cont = $('listaProductos');
   const lista = productos.filter(p => p.nombre.toLowerCase().includes(filtro.toLowerCase()));
   if (lista.length === 0) { cont.innerHTML = '<div class="vacio">Sin productos</div>'; return; }
   cont.innerHTML = lista.map(p => `
     <div class="producto-item" onclick="agregarAlCarrito(${p.id})">
-      <div class="info">
-        <div class="nombre">${p.nombre}</div>
-        <div class="stock ${p.stock <= 3 ? 'bajo' : ''}">Stock: ${p.stock} ${p.stock <= 3 ? '⚠️' : ''}</div>
-      </div>
+      <div class="info"><div class="nombre">${p.nombre}</div><div class="stock ${p.stock <= 3 ? 'bajo' : ''}">Stock: ${p.stock}</div></div>
       <div class="precio">${dinero(p.precio)}</div>
-    </div>
-  `).join('');
+    </div>`).join('');
 }
 
-// ---------- CARRITO ----------
 function agregarAlCarrito(id) {
   const prod = productos.find(p => p.id === id);
   if (!prod) return;
@@ -281,8 +186,7 @@ function agregarAlCarrito(id) {
   const enCarrito = item ? item.cant : 0;
   if (enCarrito >= prod.stock) { toast('⚠️ No hay más stock'); return; }
   if (item) item.cant++; else carrito.push({ id, nombre: prod.nombre, precio: prod.precio, cant: 1 });
-  renderCarrito();
-  toast('✅ ' + prod.nombre);
+  renderCarrito(); toast('✅ ' + prod.nombre);
 }
 
 function cambiarCantidad(id, delta) {
@@ -298,67 +202,42 @@ function cambiarCantidad(id, delta) {
 
 function renderCarrito() {
   const cont = $('carritoLista');
-  if (carrito.length === 0) {
-    cont.innerHTML = '<div class="vacio">Agrega productos para comenzar</div>';
-    $('totalCarrito').textContent = '$0.00';
-    return;
-  }
+  if (carrito.length === 0) { cont.innerHTML = '<div class="vacio">Agrega productos</div>'; $('totalCarrito').textContent = '$0.00'; return; }
   cont.innerHTML = carrito.map(i => `
     <div class="carrito-item">
-      <div style="flex:1;">
-        <div style="font-weight:600;">${i.nombre}</div>
-        <div style="font-size:0.75rem;color:#888;">${dinero(i.precio)} c/u</div>
-      </div>
-      <div class="cant">
-        <button onclick="cambiarCantidad(${i.id}, -1)">−</button>
-        <span style="min-width:20px;text-align:center;">${i.cant}</span>
-        <button onclick="cambiarCantidad(${i.id}, 1)">+</button>
-      </div>
+      <div style="flex:1;"><div style="font-weight:600;">${i.nombre}</div><div style="font-size:0.75rem;color:#888;">${dinero(i.precio)} c/u</div></div>
+      <div class="cant"><button onclick="cambiarCantidad(${i.id}, -1)">−</button><span style="min-width:20px;text-align:center;">${i.cant}</span><button onclick="cambiarCantidad(${i.id}, 1)">+</button></div>
       <div style="width:70px;text-align:right;font-weight:bold;">${dinero(i.precio * i.cant)}</div>
-    </div>
-  `).join('');
-  const total = carrito.reduce((s, i) => s + i.precio * i.cant, 0);
-  $('totalCarrito').textContent = dinero(total);
+    </div>`).join('');
+  $('totalCarrito').textContent = dinero(carrito.reduce((s, i) => s + i.precio * i.cant, 0));
 }
 
 function vaciarCarrito() {
   if (carrito.length === 0) return;
-  if (confirm('¿Cancelar la venta actual?')) { carrito = []; renderCarrito(); toast('Venta cancelada'); }
+  if (confirm('¿Cancelar la venta?')) { carrito = []; renderCarrito(); toast('Cancelada'); }
 }
 
 function cobrar() {
-  if (carrito.length === 0) { toast('El carrito está vacío'); return; }
+  if (carrito.length === 0) { toast('Carrito vacío'); return; }
   const total = carrito.reduce((s, i) => s + i.precio * i.cant, 0);
   if (!confirm(`¿Confirmar venta?\nTotal: ${dinero(total)}`)) return;
-
-  carrito.forEach(i => {
-    const p = productos.find(x => x.id === i.id);
-    if (p) p.stock -= i.cant;
-  });
+  carrito.forEach(i => { const p = productos.find(x => x.id === i.id); if (p) p.stock -= i.cant; });
   ventasHoy.push({ fecha: new Date().toISOString(), items: [...carrito], total });
-  carrito = [];
-  guardar(); renderCarrito(); renderProductos($('buscador').value); renderInventario(); renderVentas(); totalDelDia();
+  carrito = []; guardar(); renderCarrito(); renderProductos(); renderInventario(); renderVentas(); totalDelDia();
   toast('🎉 Venta registrada');
 }
 
-// ---------- INVENTARIO ----------
 function renderInventario(filtro = '') {
   const cont = $('listaInventario');
   const lista = productos.filter(p => p.nombre.toLowerCase().includes(filtro.toLowerCase()));
   if (lista.length === 0) { cont.innerHTML = '<div class="vacio">Sin productos</div>'; return; }
   cont.innerHTML = lista.map(p => `
     <div class="producto-item" style="cursor:default;">
-      <div class="info">
-        <div class="nombre">${p.nombre}</div>
-        <div class="stock ${p.stock <= 3 ? 'bajo' : ''}">Stock: ${p.stock} ${p.codigo ? '| Código: '+p.codigo : ''}</div>
-      </div>
-      <div style="display:flex;align-items:center;gap:8px;">
-        <span class="precio">${dinero(p.precio)}</span>
-        <button style="padding:6px 10px;font-size:0.8rem;background:#e0e0e0;" onclick="editarProducto(${p.id})">✏️</button>
-        <button style="padding:6px 10px;font-size:0.8rem;" class="btn-danger" onclick="eliminarProducto(${p.id})">🗑️</button>
-      </div>
-    </div>
-  `).join('');
+      <div class="info"><div class="nombre">${p.nombre}</div><div class="stock ${p.stock <= 3 ? 'bajo' : ''}">Stock: ${p.stock} ${p.codigo ? '| '+p.codigo : ''}</div></div>
+      <div style="display:flex;align-items:center;gap:8px;"><span class="precio">${dinero(p.precio)}</span>
+      <button style="padding:6px;background:#e0e0e0;" onclick="editarProducto(${p.id})">✏️</button>
+      <button style="padding:6px;" class="btn-danger" onclick="eliminarProducto(${p.id})">🗑️</button></div>
+    </div>`).join('');
 }
 
 function agregarProducto() {
@@ -367,13 +246,10 @@ function agregarProducto() {
   const stock = parseInt($('nuevoStock').value);
   const codigo = $('nuevoCodigo').value.trim();
   if (!nombre || isNaN(precio) || isNaN(stock)) { toast('⚠️ Completa los campos'); return; }
-  
   const nuevoId = productos.length ? Math.max(...productos.map(p => p.id)) + 1 : 1;
   productos.push({ id: nuevoId, nombre, precio, stock, codigo });
-  guardar();
-  $('nuevoNombre').value = ''; $('nuevoPrecio').value = ''; $('nuevoStock').value = '10'; $('nuevoCodigo').value = '';
-  renderProductos(); renderInventario();
-  toast('✅ Producto agregado');
+  guardar(); $('nuevoNombre').value = ''; $('nuevoPrecio').value = ''; $('nuevoStock').value = '10'; $('nuevoCodigo').value = '';
+  renderProductos(); renderInventario(); toast('✅ Producto agregado');
 }
 
 function editarProducto(id) {
@@ -382,19 +258,15 @@ function editarProducto(id) {
   const precio = parseFloat(prompt('Precio:', p.precio)); if (isNaN(precio)) return;
   const stock = parseInt(prompt('Stock:', p.stock)); if (isNaN(stock)) return;
   p.nombre = nombre.trim() || p.nombre; p.precio = precio; p.stock = stock;
-  guardar(); renderProductos($('buscador').value); renderInventario();
-  toast('✏️ Actualizado');
+  guardar(); renderProductos(); renderInventario(); toast('✏️ Actualizado');
 }
 
 function eliminarProducto(id) {
   if (!confirm('¿Eliminar producto?')) return;
-  productos = productos.filter(x => x.id !== id);
-  carrito = carrito.filter(i => i.id !== id);
-  guardar(); renderProductos(); renderInventario(); renderCarrito();
-  toast('🗑️ Eliminado');
+  productos = productos.filter(x => x.id !== id); carrito = carrito.filter(i => i.id !== id);
+  guardar(); renderProductos(); renderInventario(); renderCarrito(); toast('🗑️ Eliminado');
 }
 
-// ---------- HISTORIAL ----------
 function renderVentas() {
   const cont = $('listaVentas');
   if (ventasHoy.length === 0) { cont.innerHTML = '<div class="vacio">Sin ventas hoy</div>'; return; }
@@ -402,91 +274,90 @@ function renderVentas() {
   cont.innerHTML = ventasHoy.slice().reverse().map(v => {
     const h = new Date(v.fecha);
     const hora = h.getHours().toString().padStart(2,'0') + ':' + h.getMinutes().toString().padStart(2,'0');
-    return `<div class="venta-item">
-      <div style="display:flex;justify-content:space-between;font-weight:600;">
-        <span class="hora">${hora}</span><span style="color:#2e7d32;">${dinero(v.total)}</span>
-      </div>
-      <div style="color:#666;">${v.items.map(i => `${i.cant}x ${i.nombre}`).join(', ')}</div>
-    </div>`;
-  }).join('') + `<div style="margin-top:12px;padding:10px;background:#e8f5e9;border-radius:8px;display:flex;justify-content:space-between;font-weight:bold;">
-      <span>TOTAL DEL DÍA</span><span style="color:#2e7d32;">${dinero(total)}</span></div>`;
+    return `<div class="venta-item"><div style="display:flex;justify-content:space-between;font-weight:600;"><span class="hora">${hora}</span><span style="color:#2e7d32;">${dinero(v.total)}</span></div><div style="color:#666;">${v.items.map(i => `${i.cant}x ${i.nombre}`).join(', ')}</div></div>`;
+  }).join('') + `<div style="margin-top:12px;padding:10px;background:#e8f5e9;border-radius:8px;display:flex;justify-content:space-between;font-weight:bold;"><span>TOTAL</span><span style="color:#2e7d32;">${dinero(total)}</span></div>`;
 }
 
 function cerrarDia() {
   if (ventasHoy.length === 0) { toast('No hay ventas'); return; }
-  if (!confirm('¿Cerrar el día? Se borrará el historial de ventas.')) return;
+  if (!confirm('¿Cerrar el día?')) return;
   ventasHoy = []; guardar(); renderVentas(); totalDelDia(); toast('📊 Día cerrado');
 }
 
-// ---------- LÓGICA DEL ESCÁNER ----------
+// --- LÓGICA DE CÁMARA MEJORADA ---
 async function abrirEscaner(modo) {
   modoEscaner = modo;
   $('modalEscaner').classList.remove('oculto');
-  $('scannerStatus').textContent = 'Iniciando cámara...';
-  
+  $('scannerStatus').textContent = 'Conectando cámara...';
+  $('overlayEscaneo').style.display = 'none'; // Ocultar cuadro hasta que cargue
+
+  if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+    $('scannerStatus').textContent = '❌ Error: Usa Chrome y asegúrate de que sea HTTPS.';
+    return;
+  }
+
   try {
-    // Solicitar cámara trasera
+    // Pedir cámara sin forzar resolución extrema para evitar fallos en algunos celulares
     streamCamara = await navigator.mediaDevices.getUserMedia({ 
-      video: { facingMode: 'environment', width: { ideal: 1280 }, height: { ideal: 720 } } 
+      video: { facingMode: { ideal: 'environment' } } 
     });
+    
     const video = $('scannerVideo');
     video.srcObject = streamCamara;
-    await video.play();
     
-    // Verificar si BarcodeDetector está disponible (nativo o polyfill)
-    if ('BarcodeDetector' in window) {
-      // Formatos comunes en tiendas de abarrotes (EAN-13, UPC-A, Code 128)
-      detectorCodigo = new BarcodeDetector({ formats: ['ean_13', 'upc_a', 'code_128', 'qr_code'] });
-      $('scannerStatus').textContent = 'Apunta al código de barras...';
-      iniciarBucleDeteccion(video);
-    } else {
-      $('scannerStatus').textContent = '❌ Tu navegador no soporta escaneo. Usa Chrome en Android o actualiza tu navegador.';
-    }
+    // IMPORTANTE: Esperar a que el video esté listo antes de mostrarlo
+    video.onloadedmetadata = () => {
+      video.play();
+      $('scannerStatus').textContent = 'Apunta al código de barras';
+      $('overlayEscaneo').style.display = 'block';
+      iniciarDeteccion(video);
+    };
+
   } catch (err) {
-    console.error(err);
-    $('scannerStatus').textContent = '❌ Error al acceder a la cámara. Asegúrate de usar HTTPS y dar permisos.';
+    console.error("Error de cámara:", err);
+    $('scannerStatus').innerHTML = '❌ No se pudo iniciar la cámara.<br><small>Revisa los permisos de Chrome.</small>';
   }
 }
 
-function iniciarBucleDeteccion(video) {
+function iniciarDeteccion(video) {
   if (intervaloEscaneo) clearInterval(intervaloEscaneo);
+  
+  // Usar BarcodeDetector si está disponible
+  if ('BarcodeDetector' in window) {
+    try {
+      detectorCodigo = new BarcodeDetector({ formats: ['ean_13', 'upc_a', 'code_128', 'qr_code'] });
+    } catch (e) {
+      console.warn("Formatos no soportados", e);
+      detectorCodigo = new BarcodeDetector(); // Intentar por defecto
+    }
+  } else {
+    $('scannerStatus').textContent = '❌ Escáner no soportado. Abre con Chrome.';
+    return;
+  }
+
   intervaloEscaneo = setInterval(async () => {
     if (video.readyState === video.HAVE_ENOUGH_DATA) {
       try {
         const codigos = await detectorCodigo.detect(video);
         if (codigos.length > 0) {
-          const codigo = codigos[0].rawValue;
-          procesarCodigoEscaneado(codigo);
+          procesarCodigoEscaneado(codigos[0].rawValue);
         }
-      } catch (e) { /* Ignorar errores de frames individuales */ }
+      } catch (e) { }
     }
-  }, 300); // Escanear cada 300ms
+  }, 400); // Revisar cada 400ms
 }
 
 function procesarCodigoEscaneado(codigo) {
-  // Detener escaneo para evitar múltiples lecturas del mismo código
   if (intervaloEscaneo) { clearInterval(intervaloEscaneo); intervaloEscaneo = null; }
-  
-  cerrarEscaner(); // Cierra la cámara primero
+  cerrarEscaner();
   
   if (modoEscaner === 'registro') {
-    // Modo registrar producto: poner el código en el campo de texto
     $('nuevoCodigo').value = codigo;
-    toast('📷 Código capturado: ' + codigo);
+    toast('📷 Código: ' + codigo);
   } else if (modoEscaner === 'venta') {
-    // Modo venta: buscar el producto y agregarlo al carrito
     const producto = productos.find(p => p.codigo === codigo);
-    if (producto) {
-      agregarAlCarrito(producto.id);
-    } else {
-      // Preguntar si quiere registrarlo rápido
-      if (confirm(`Código ${codigo} no encontrado.\n¿Quieres registrarlo como nuevo producto?`)) {
-        // Cambiar a pestaña productos y prellenar código
-        document.querySelector('[data-tab="productos"]').click();
-        $('nuevoCodigo').value = codigo;
-        $('nuevoNombre').focus();
-      }
-    }
+    if (producto) { agregarAlCarrito(producto.id); } 
+    else { if (confirm(`Código ${codigo} no registrado.\n¿Registrarlo ahora?`)) { document.querySelector('[data-tab="productos"]').click(); $('nuevoCodigo').value = codigo; $('nuevoNombre').focus(); } }
   }
 }
 
@@ -498,9 +369,9 @@ function cerrarEscaner() {
     streamCamara = null;
   }
   $('scannerVideo').srcObject = null;
+  $('scannerVideo').pause();
 }
 
-// ---------- TABS ----------
 document.querySelectorAll('.tab').forEach(tab => {
   tab.addEventListener('click', () => {
     document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
@@ -513,13 +384,7 @@ document.querySelectorAll('.tab').forEach(tab => {
 $('buscador').addEventListener('input', e => renderProductos(e.target.value));
 $('buscadorInv').addEventListener('input', e => renderInventario(e.target.value));
 
-// ---------- INICIO ----------
-actualizarFecha();
-renderProductos();
-renderCarrito();
-renderInventario();
-renderVentas();
-totalDelDia();
+actualizarFecha(); renderProductos(); renderCarrito(); renderInventario(); renderVentas(); totalDelDia();
 </script>
 </body>
 </html>
