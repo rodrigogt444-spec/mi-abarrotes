@@ -10,8 +10,8 @@
   @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
 
   :root {
-    --primary: #1565c0;      /* Azul Rey */
-    --primary-light: #42a5f5;/* Azul Claro */
+    --primary: #1565c0;      
+    --primary-light: #42a5f5;
     --bg: #f4f7f6;
     --card: #ffffff;
     --text: #263238;
@@ -27,7 +27,7 @@
     color: var(--text); 
     padding: 12px; 
     padding-bottom: 80px; 
-    font-size: 14px; /* Fuente base más pequeña */
+    font-size: 14px; 
   }
   
   .app { max-width: 900px; margin: 0 auto; display: none; } 
@@ -104,9 +104,19 @@
   .btn-danger { background: var(--danger); color: white; }
   .btn-warning { background: var(--warning); color: #333; }
   .btn-full { width: 100%; margin-top: 8px; }
-  .btn-small { padding: 6px 10px; font-size: 0.75rem; }
+  
+  /* BOTÓN DE ESCANEAR EN VENDER */
+  .scan-action-box {
+    background: #e3f2fd; border: 2px dashed var(--primary-light);
+    border-radius: 10px; padding: 10px; margin-bottom: 12px;
+    display: flex; align-items: center; justify-content: space-between; cursor: pointer;
+    transition: background 0.2s;
+  }
+  .scan-action-box:hover { background: #bbdefb; }
+  .scan-action-box span { font-weight: 600; color: var(--primary); font-size: 0.9rem; }
+  .scan-action-box .icon { font-size: 1.5rem; }
 
-  /* --- LISTAS --- */
+  /* LISTAS */
   .productos-lista { max-height: 350px; overflow-y: auto; padding-right: 2px; }
   .producto-item {
     display: flex; justify-content: space-between; align-items: center;
@@ -134,7 +144,6 @@
   .form-nuevo { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
   .form-nuevo .full { grid-column: span 2; }
   
-  /* CAMPO DE CÓDIGO CON BOTÓN CÁMARA */
   .input-with-btn { display: flex; gap: 6px; }
   .input-with-btn input { flex: 1; }
   .btn-cam { background: var(--primary-light); color: white; padding: 0 12px; display: flex; align-items: center; justify-content: center; border-radius: 8px;}
@@ -191,12 +200,23 @@
   </div>
 
   <div id="tab-ventas" class="grid">
+    <!-- COLUMNA IZQUIERDA: PRODUCTOS Y ESCÁNER -->
     <div class="card">
+      <!-- BOTÓN DE ESCANEAR PARA VENDER -->
+      <div class="scan-action-box" onclick="abrirEscanerVenta()">
+        <div style="display:flex; align-items:center; gap:10px;">
+          <span class="icon">📷</span>
+          <span>Escanear y Vender</span>
+        </div>
+        <div>></div>
+      </div>
+
       <h2>Productos</h2>
       <input type="text" id="buscador" placeholder="🔍 Buscar producto...">
       <div class="productos-lista" id="listaProductos" style="margin-top:10px;"></div>
     </div>
 
+    <!-- COLUMNA DERECHA: CARRITO -->
     <div class="card">
       <h2>Carrito de venta</h2>
       <div class="carrito-lista" id="carritoLista"><div class="vacio">Agrega productos</div></div>
@@ -214,10 +234,9 @@
         <input type="number" id="nuevoPrecio" placeholder="Precio $" step="0.01" min="0">
         <input type="number" id="nuevoStock" placeholder="Stock" min="0" value="10">
         
-        <!-- Campo de código con botón de cámara -->
         <div class="input-with-btn full">
           <input type="text" id="nuevoCodigo" placeholder="Código de barras (opcional)">
-          <button class="btn-cam" onclick="abrirEscaner()">📷</button>
+          <button class="btn-cam" onclick="abrirEscanerRegistro()">📷</button>
         </div>
         
         <button class="btn-primary full" onclick="agregarProducto()">Guardar Producto</button>
@@ -235,7 +254,6 @@
       <h2>🧾 Historial de Ventas</h2>
       <div id="listaVentas" style="max-height:400px; overflow-y:auto;"></div>
       
-      <!-- Solo el admin verá este botón -->
       <div id="contenedorCerrarDia" class="oculto">
         <button class="btn-warning btn-full" style="margin-top:15px;" onclick="cerrarDia()">📊 Cerrar Día y Reiniciar</button>
       </div>
@@ -254,8 +272,6 @@
 <div class="toast" id="toast"></div>
 
 <script>
-// --- BASE DE DATOS DE USUARIOS ---
-// Puedes cambiar los PIN y nombres aquí.
 const USUARIOS = {
   "1234": { nombre: "Administrador", rol: "admin" },
   "0000": { nombre: "Empleado", rol: "cajero" }
@@ -263,15 +279,16 @@ const USUARIOS = {
 
 let usuarioActual = null;
 let html5QrCode = null;
+let modoCamara = 'registro'; // 'registro' o 'venta'
 
-let productos = JSON.parse(localStorage.getItem('prod_abarrotes_v6') || '[]');
-let ventasHoy = JSON.parse(localStorage.getItem('ventas_abarrotes_v6') || '[]');
+let productos = JSON.parse(localStorage.getItem('prod_abarrotes_v7') || '[]');
+let ventasHoy = JSON.parse(localStorage.getItem('ventas_abarrotes_v7') || '[]');
 let carrito = [];
 
 if (productos.length === 0) {
   productos = [
-    { id: 1, nombre: 'Refresco 600ml', precio: 18, stock: 20, codigo: '' },
-    { id: 2, nombre: 'Sabritas 45g', precio: 16, stock: 15, codigo: '' },
+    { id: 1, nombre: 'Refresco 600ml', precio: 18, stock: 20, codigo: '7501055300123' },
+    { id: 2, nombre: 'Sabritas 45g', precio: 16, stock: 15, codigo: '7501011111111' },
     { id: 3, nombre: 'Pan blanco', precio: 42, stock: 8, codigo: '' }
   ];
   guardar();
@@ -281,8 +298,8 @@ const $ = id => document.getElementById(id);
 const dinero = n => '$' + n.toFixed(2);
 
 function guardar() {
-  localStorage.setItem('prod_abarrotes_v6', JSON.stringify(productos));
-  localStorage.setItem('ventas_abarrotes_v6', JSON.stringify(ventasHoy));
+  localStorage.setItem('prod_abarrotes_v7', JSON.stringify(productos));
+  localStorage.setItem('ventas_abarrotes_v7', JSON.stringify(ventasHoy));
 }
 
 function toast(msg) {
@@ -290,31 +307,24 @@ function toast(msg) {
   setTimeout(() => t.classList.remove('show'), 2000);
 }
 
-// --- LOGIN Y PERMISOS ---
 function verificarLogin() {
   const pin = $('inputPin').value;
   const user = USUARIOS[pin];
-
   if (user) {
     usuarioActual = user;
     $('loginScreen').style.display = 'none';
     $('appPrincipal').style.display = 'block';
     $('inputPin').value = '';
-    
-    // Configurar UI según el rol
     $('nombreUsuario').textContent = user.nombre;
     
     if (user.rol === 'admin') {
       $('tabBtnProductos').style.display = 'block';
       $('contenedorCerrarDia').classList.remove('oculto');
     } else {
-      // Si es cajero, ocultar pestaña de productos y botón de cerrar día
       $('tabBtnProductos').style.display = 'none';
       $('contenedorCerrarDia').classList.add('oculto');
-      // Si estaba en productos, regresarlo a ventas
       document.querySelector('[data-tab="ventas"]').click();
     }
-    
     iniciarApp();
   } else {
     toast('❌ PIN incorrecto');
@@ -333,13 +343,8 @@ $('inputPin').addEventListener('keypress', function (e) {
   if (e.key === 'Enter') verificarLogin();
 });
 
-// --- LÓGICA DE LA APP ---
 function iniciarApp() {
-  actualizarFecha();
-  renderProductos();
-  renderCarrito();
-  renderInventario();
-  renderVentas();
+  actualizarFecha(); renderProductos(); renderCarrito(); renderInventario(); renderVentas();
 }
 
 function actualizarFecha() {
@@ -368,9 +373,9 @@ function agregarAlCarrito(id) {
   if (!prod) return;
   const item = carrito.find(i => i.id === id);
   const enCarrito = item ? item.cant : 0;
-  if (enCarrito >= prod.stock) { toast('⚠️ No hay más stock'); return; }
+  if (enCarrito >= prod.stock) { toast('⚠️ No hay más stock de ' + prod.nombre); return; }
   if (item) item.cant++; else carrito.push({ id, nombre: prod.nombre, precio: prod.precio, cant: 1 });
-  renderCarrito(); toast('✅ Agregado');
+  renderCarrito(); toast('✅ ' + prod.nombre);
 }
 
 function cambiarCantidad(id, delta) {
@@ -417,8 +422,7 @@ function cobrar() {
   ventasHoy.push({ fecha: new Date().toISOString(), items: [...carrito], total });
   
   carrito = []; 
-  guardar(); 
-  renderCarrito(); renderProductos($('buscador').value); renderInventario(); renderVentas(); 
+  guardar(); renderCarrito(); renderProductos($('buscador').value); renderInventario(); renderVentas(); 
   toast('🎉 Venta cobrada');
 }
 
@@ -501,25 +505,28 @@ function renderVentas() {
 
 function cerrarDia() {
   if (ventasHoy.length === 0) { toast('No hay ventas'); return; }
-  
-  // Verificación extra de PIN para cerrar el día
   const pin = prompt("🔒 PIN de Administrador para cerrar el día:");
   if (pin !== "1234") {
     if(pin !== null) toast('❌ PIN incorrecto');
     return;
   }
-
   const total = ventasHoy.reduce((s, v) => s + v.total, 0);
   if (!confirm(`¿Cerrar el día?\n\nTotal vendido: ${dinero(total)}`)) return;
-  
-  ventasHoy = []; 
-  guardar(); 
-  renderVentas(); 
-  toast('📊 Día cerrado');
+  ventasHoy = []; guardar(); renderVentas(); toast('📊 Día cerrado');
 }
 
 // --- ESCÁNER DE CÁMARA ---
-async function abrirEscaner() {
+function abrirEscanerVenta() {
+  modoCamara = 'venta';
+  iniciarCamara();
+}
+
+function abrirEscanerRegistro() {
+  modoCamara = 'registro';
+  iniciarCamara();
+}
+
+async function iniciarCamara() {
   $('modalEscaner').classList.remove('oculto');
   html5QrCode = new Html5Qrcode("reader");
 
@@ -528,16 +535,31 @@ async function abrirEscaner() {
       { facingMode: "environment" },
       { fps: 10, qrbox: { width: 250, height: 150 } },
       (decodedText) => {
-        // Cuando lee el código, lo pone en el input y cierra
-        $('nuevoCodigo').value = decodedText;
-        toast('📷 Código capturado');
-        cerrarEscaner();
+        procesarCodigoEscaneado(decodedText);
       },
       (errorMessage) => { /* Ignorar frames fallidos */ }
     );
   } catch (err) {
     toast('❌ Error al abrir cámara');
     cerrarEscaner();
+  }
+}
+
+function procesarCodigoEscaneado(codigo) {
+  cerrarEscaner();
+
+  if (modoCamara === 'registro') {
+    $('nuevoCodigo').value = codigo;
+    toast('📷 Código capturado');
+  
+  } else if (modoCamara === 'venta') {
+    const prod = productos.find(p => p.codigo === codigo);
+    if (prod) {
+      // Lo encuentra: lo agrega al carrito directo
+      agregarAlCarrito(prod.id);
+    } else {
+      toast('❌ Código no registrado');
+    }
   }
 }
 
