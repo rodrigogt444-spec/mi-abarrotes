@@ -195,7 +195,7 @@
     </div>
   </div>
 
-  <!-- PESTAÑA CORTE (antes Historial) -->
+  <!-- PESTAÑA CORTE -->
   <div id="tab-historial" class="oculto">
     <div class="card">
       <h2>📋 Corte del Día</h2>
@@ -487,7 +487,7 @@ function renderVentas() {
     </div>`;
 }
 
-// --- GENERACIÓN DE PDF Y ENVÍOS (Solo Inventario) ---
+// --- GENERACIÓN DE PDF ---
 function generarPDFInventario() {
   const { jsPDF } = window.jspdf;
   const doc = new jsPDF();
@@ -510,24 +510,51 @@ function generarPDFInventario() {
   return doc;
 }
 
+// --- NUEVA FUNCIÓN DE ENVÍO DE CORREO (CON FORMULARIO HTML) ---
 async function enviarCorreo(doc, nombreArchivo, asunto) {
   if (!config.correo) { toast('⚠️ Configura primero el correo en Mantenimiento'); return; }
   toast('📧 Enviando correo...');
-  const pdfBase64 = doc.output('datauristring');
-  try {
-    const res = await fetch("https://formsubmit.co/ajax/" + config.correo, {
-      method: "POST",
-      headers: { "Content-Type": "application/json", "Accept": "application/json" },
-      body: JSON.stringify({
-        _subject: asunto,
-        _template: "table",
-        _captcha: "false",
-        Mensaje: "Adjunto encontrarás el reporte generado desde el sistema POS.",
-        Archivo_Adjunto: `<a href="${pdfBase64}" download="${nombreArchivo}">Descargar PDF</a>`
-      })
-    });
-    if (res.ok) { toast('✅ Correo enviado'); } else { toast('❌ Error al enviar. Revisa el correo.'); }
-  } catch (e) { toast('❌ Error de conexión al enviar correo'); }
+
+  // 1. Crear el formulario temporal
+  const form = document.createElement('form');
+  form.method = 'POST';
+  form.action = 'https://formsubmit.co/' + config.correo;
+  form.enctype = 'multipart/form-data';
+  form.style.display = 'none';
+
+  // 2. Agregar campos de configuración para FormSubmit
+  const addField = (name, value) => {
+    const input = document.createElement('input');
+    input.type = 'hidden';
+    input.name = name;
+    input.value = value;
+    form.appendChild(input);
+  };
+  
+  addField('_subject', asunto);
+  addField('_captcha', 'false');
+  addField('_template', 'table');
+  addField('Mensaje', 'Adjunto encontrarás el reporte generado desde el sistema POS.');
+
+  // 3. Convertir el PDF generado a un Blob y adjuntarlo
+  const pdfBlob = doc.output('blob');
+  const file = new File([pdfBlob], nombreArchivo, { type: 'application/pdf' });
+  
+  // El nombre del campo (ej. 'attachment') es el que verás en el correo
+  const dataTransfer = new DataTransfer();
+  dataTransfer.items.add(file);
+  const fileInput = document.createElement('input');
+  fileInput.type = 'file';
+  fileInput.name = 'attachment';
+  fileInput.files = dataTransfer.files;
+  form.appendChild(fileInput);
+
+  // 4. Enviar el formulario y limpiar
+  document.body.appendChild(form);
+  form.submit();
+  document.body.removeChild(form);
+
+  toast('✅ Correo enviado con PDF adjunto');
 }
 
 function enviarInventario() {
@@ -544,7 +571,6 @@ function cerrarDia() {
   const total = ventasHoy.reduce((s, v) => s + v.total, 0);
   if (!confirm(`¿Cerrar el día?\n\nTotal vendido: ${dinero(total)}\nSe borrará el historial de ventas.`)) return;
   
-  // Ya no se envía PDF por correo ni WhatsApp aquí. Solo se reinicia.
   ventasHoy = []; 
   guardar(); 
   renderVentas(); 
