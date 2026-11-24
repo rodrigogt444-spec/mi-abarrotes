@@ -95,7 +95,7 @@
   .input-with-btn input { flex: 1; margin-bottom: 0;}
   .btn-cam { background: var(--primary-light); color: white; padding: 0 12px; display: flex; align-items: center; justify-content: center; border-radius: 8px;}
 
-  /* --- VENTAS --- */
+  /* --- VENTAS / CORTE --- */
   .venta-item { padding: 10px 0; border-bottom: 1px solid #eceff1; }
   .venta-item .header-venta { display: flex; justify-content: space-between; font-weight: 600; margin-bottom: 4px; font-size: 0.85rem;}
   .venta-item .hora { color: var(--text-muted); font-size: 0.75rem; font-weight: 400; }
@@ -116,8 +116,8 @@
 <!-- PANTALLA DE LOGIN -->
 <div id="loginScreen">
   <div class="login-card">
-    <h1>🏪 Chiles Secos y Semillas</h1>
-    <p>Ingresa Tu Acceso</p>
+    <h1>🏪 Mi Abarrotes</h1>
+    <p>Ingresa tu PIN de acceso</p>
     <input type="password" id="inputPin" class="login-input" placeholder="••••" maxlength="4" inputmode="numeric" autocomplete="off">
     <button class="btn-login" onclick="verificarLogin()">Entrar al Sistema</button>
   </div>
@@ -127,7 +127,7 @@
 <div class="app" id="appPrincipal">
   <header>
     <div>
-      <h1>🏪 Chiles Secos y Semillas</h1>
+      <h1>🏪 Mi Abarrotes</h1>
       <div class="subtitle" id="fechaHoy"></div>
     </div>
     <div class="user-info">
@@ -139,14 +139,13 @@
   <div class="tabs">
     <div class="tab active" data-tab="ventas">🛒 Vender</div>
     <div class="tab tab-admin oculto" data-tab="productos">📦 Productos</div>
-    <div class="tab tab-admin oculto" data-tab="historial">📋 Historial</div>
+    <div class="tab tab-admin oculto" data-tab="historial">📋 Corte</div>
     <div class="tab tab-super oculto" data-tab="mantenimiento">⚙️ Config</div>
   </div>
 
   <!-- PESTAÑA VENDER -->
   <div id="tab-ventas" class="grid">
     <div class="card">
-      <!-- ESCANEAR Y VENDER -->
       <div class="scan-action-box" onclick="abrirEscanerVenta()">
         <div style="display:flex; align-items:center; gap:10px;">
           <span class="icon">📷</span>
@@ -154,13 +153,10 @@
         </div>
         <div>></div>
       </div>
-
-      <!-- SOLO BUSCADOR (Ya no hay lista de productos visible) -->
       <h2>Buscar Producto</h2>
       <input type="text" id="buscadorVenta" placeholder="🔍 Escribe el nombre del producto...">
       <div class="productos-lista" id="resultadosBusqueda" style="margin-top:10px;"></div>
     </div>
-
     <div class="card">
       <h2>Carrito de venta</h2>
       <div class="carrito-lista" id="carritoLista"><div class="vacio">Agrega productos</div></div>
@@ -170,27 +166,22 @@
     </div>
   </div>
 
-  <!-- PESTAÑA PRODUCTOS (Solo Admin y Super) -->
+  <!-- PESTAÑA PRODUCTOS -->
   <div id="tab-productos" class="oculto">
     <div class="card">
       <h2>➕ Nuevo Producto</h2>
       <div class="form-nuevo">
         <input type="text" id="nuevoNombre" class="full" placeholder="Nombre del producto">
-        
-        <!-- Selección de Unidad de Medida -->
         <select id="nuevaUnidad" class="full">
           <option value="pz">Venta por Pieza (pz)</option>
           <option value="kg">Venta por Granel (kg)</option>
         </select>
-
         <input type="number" id="nuevoPrecio" placeholder="Precio $" step="0.01" min="0">
         <input type="number" id="nuevoStock" placeholder="Stock" min="0" value="10" step="0.01">
-        
         <div class="input-with-btn full">
           <input type="text" id="nuevoCodigo" placeholder="Código de barras (opcional)">
           <button class="btn-cam" onclick="abrirEscanerRegistro()">📷</button>
         </div>
-        
         <button class="btn-primary full" onclick="agregarProducto()">Guardar Producto</button>
       </div>
     </div>
@@ -204,10 +195,10 @@
     </div>
   </div>
 
-  <!-- PESTAÑA HISTORIAL (Solo Admin y Super) -->
+  <!-- PESTAÑA CORTE (antes Historial) -->
   <div id="tab-historial" class="oculto">
     <div class="card">
-      <h2>🧾 Historial de Ventas</h2>
+      <h2>📋 Corte del Día</h2>
       <div id="listaVentas" style="max-height:400px; overflow-y:auto;"></div>
       
       <div id="contenedorCerrarDia" class="oculto">
@@ -216,18 +207,15 @@
     </div>
   </div>
 
-  <!-- PESTAÑA MANTENIMIENTO (Solo Super Admin) -->
+  <!-- PESTAÑA MANTENIMIENTO -->
   <div id="tab-mantenimiento" class="oculto">
     <div class="card">
       <h2>⚙️ Mantenimiento / Envío de Reportes</h2>
       <p style="font-size:0.8rem; color:var(--text-muted); margin-bottom:15px;">Configura los datos donde se enviarán los cortes de caja y los inventarios.</p>
-      
       <label style="font-size:0.85rem; font-weight:600; color:var(--primary);">Correo Electrónico:</label>
       <input type="email" id="configCorreo" placeholder="ejemplo@correo.com">
-      
       <label style="font-size:0.85rem; font-weight:600; color:var(--primary); margin-top:10px;">WhatsApp (con código de país, ej. 521234567890):</label>
       <input type="text" id="configWhatsapp" placeholder="521234567890">
-      
       <button class="btn-primary btn-full" onclick="guardarConfiguracion()">Guardar Datos</button>
     </div>
   </div>
@@ -244,19 +232,16 @@
 <div class="toast" id="toast"></div>
 
 <script>
-// --- SISTEMA DE USUARIOS ---
-// Modifica los PIN a tu gusto
 const USUARIOS = {
-  "0000": { nombre: "Empleado", rol: "cajero" },        // Solo Vender
-  "1234": { nombre: "Administrador", rol: "admin" },    // Vender, Productos, Historial
-  "9999": { nombre: "Súper Admin", rol: "super" }       // Todo (incluye Configuración)
+  "0000": { nombre: "Empleado", rol: "cajero" },
+  "1234": { nombre: "Administrador", rol: "admin" },
+  "9999": { nombre: "Súper Admin", rol: "super" }
 };
 
 let usuarioActual = null;
 let html5QrCode = null;
 let modoCamara = 'registro'; 
 
-// Cargar datos
 let productos = JSON.parse(localStorage.getItem('prod_abarrotes_v9') || '[]');
 let ventasHoy = JSON.parse(localStorage.getItem('ventas_abarrotes_v9') || '[]');
 let carrito = [];
@@ -277,20 +262,16 @@ function guardar() {
   localStorage.setItem('prod_abarrotes_v9', JSON.stringify(productos));
   localStorage.setItem('ventas_abarrotes_v9', JSON.stringify(ventasHoy));
 }
-function guardarConfig() {
-  localStorage.setItem('config_abarrotes', JSON.stringify(config));
-}
+function guardarConfig() { localStorage.setItem('config_abarrotes', JSON.stringify(config)); }
 
 function toast(msg) {
   const t = $('toast'); t.textContent = msg; t.classList.add('show');
   setTimeout(() => t.classList.remove('show'), 2000);
 }
 
-// --- LOGIN Y ROLES ---
 function verificarLogin() {
   const pin = $('inputPin').value;
   const user = USUARIOS[pin];
-  
   if (user) {
     usuarioActual = user;
     $('loginScreen').style.display = 'none';
@@ -298,24 +279,20 @@ function verificarLogin() {
     $('inputPin').value = '';
     $('nombreUsuario').textContent = user.nombre;
     
-    // Ocultar todas las pestañas administrativas por defecto
     document.querySelectorAll('.tab-admin').forEach(el => el.classList.add('oculto'));
     document.querySelectorAll('.tab-super').forEach(el => el.classList.add('oculto'));
     $('contenedorCerrarDia').classList.add('oculto');
 
-    // Asignar permisos
     if (user.rol === 'admin' || user.rol === 'super') {
       document.querySelectorAll('.tab-admin').forEach(el => el.classList.remove('oculto'));
       $('contenedorCerrarDia').classList.remove('oculto');
     }
     if (user.rol === 'super') {
       document.querySelectorAll('.tab-super').forEach(el => el.classList.remove('oculto'));
-      // Cargar config
       $('configCorreo').value = config.correo || '';
       $('configWhatsapp').value = config.whatsapp || '';
     }
 
-    // Regresar a ventas por defecto
     document.querySelector('[data-tab="ventas"]').click();
     iniciarApp();
   } else {
@@ -341,7 +318,6 @@ function actualizarFecha() {
   $('fechaHoy').textContent = `${dias[d.getDay()]}, ${d.getDate()} ${meses[d.getMonth()]} ${d.getFullYear()}`;
 }
 
-// --- LÓGICA DE PRODUCTOS ---
 function renderInventario(filtro = '') {
   const cont = $('listaInventario');
   const lista = productos.filter(p => p.nombre.toLowerCase().includes(filtro.toLowerCase()));
@@ -398,17 +374,12 @@ function eliminarProducto(id) {
   toast('🗑️ Eliminado');
 }
 
-// --- LÓGICA DE VENTA ---
-// Buscador de ventas (solo busca, no muestra lista completa)
 $('buscadorVenta').addEventListener('input', e => {
   const filtro = e.target.value.toLowerCase();
   const cont = $('resultadosBusqueda');
-  
-  if (filtro.length < 2) { cont.innerHTML = ''; return; } // No buscar hasta escribir 2 letras
-  
+  if (filtro.length < 2) { cont.innerHTML = ''; return; }
   const lista = productos.filter(p => p.nombre.toLowerCase().includes(filtro));
   if (lista.length === 0) { cont.innerHTML = '<div class="vacio">No se encontraron productos</div>'; return; }
-  
   cont.innerHTML = lista.map(p => `
     <div class="producto-item" onclick="seleccionarProducto(${p.id})">
       <div>
@@ -419,12 +390,9 @@ $('buscadorVenta').addEventListener('input', e => {
     </div>`).join('');
 });
 
-// Al dar clic en un resultado del buscador
 function seleccionarProducto(id) {
   const prod = productos.find(p => p.id === id);
   if (!prod) return;
-  
-  // Si es pieza (pz), se agrega 1 directo. Si es kilo (kg), pregunta cuánto.
   if (prod.unidad === 'pz') {
     agregarAlCarrito(id, 1);
   } else {
@@ -434,8 +402,6 @@ function seleccionarProducto(id) {
     if (isNaN(cantidad) || cantidad <= 0) { toast('⚠️ Cantidad inválida'); return; }
     agregarAlCarrito(id, cantidad);
   }
-  
-  // Limpiar el buscador después de agregar
   $('buscadorVenta').value = '';
   $('resultadosBusqueda').innerHTML = '';
 }
@@ -443,18 +409,12 @@ function seleccionarProducto(id) {
 function agregarAlCarrito(id, cantidad) {
   const prod = productos.find(p => p.id === id);
   if (!prod) return;
-  
   const item = carrito.find(i => i.id === id);
   const enCarrito = item ? item.cant : 0;
   const totalRequerido = enCarrito + cantidad;
-  
   if (totalRequerido > prod.stock) { toast('⚠️ Stock insuficiente'); return; }
-  
-  if (item) {
-    item.cant += cantidad;
-  } else {
-    carrito.push({ id, nombre: prod.nombre, precio: prod.precio, cant: cantidad, unidad: prod.unidad });
-  }
+  if (item) { item.cant += cantidad; } 
+  else { carrito.push({ id, nombre: prod.nombre, precio: prod.precio, cant: cantidad, unidad: prod.unidad }); }
   renderCarrito(); 
   toast('✅ Agregado');
 }
@@ -464,14 +424,9 @@ function cambiarCantidad(id, delta) {
   if (!item) return;
   const prod = productos.find(p => p.id === id);
   const nueva = parseFloat((item.cant + delta).toFixed(2)); 
-  
-  if (nueva <= 0) {
-    carrito = carrito.filter(i => i.id !== id);
-  } else if (nueva > prod.stock) { 
-    toast('⚠️ Stock insuficiente'); return; 
-  } else {
-    item.cant = nueva;
-  }
+  if (nueva <= 0) { carrito = carrito.filter(i => i.id !== id); }
+  else if (nueva > prod.stock) { toast('⚠️ Stock insuficiente'); return; }
+  else { item.cant = nueva; }
   renderCarrito();
 }
 
@@ -503,21 +458,17 @@ function cobrar() {
   if (carrito.length === 0) { toast('Carrito vacío'); return; }
   const total = carrito.reduce((s, i) => s + i.precio * i.cant, 0);
   if (!confirm(`Cobrar Total: ${dinero(total)}?`)) return;
-  
   carrito.forEach(i => { const p = productos.find(x => x.id === i.id); if (p) p.stock = parseFloat((p.stock - i.cant).toFixed(2)); });
   ventasHoy.push({ fecha: new Date().toISOString(), items: [...carrito], total });
-  
   carrito = []; 
   guardar(); renderCarrito(); renderInventario(); renderVentas(); 
   toast('🎉 Venta cobrada');
 }
 
-// --- HISTORIAL Y PDF ---
 function renderVentas() {
   const cont = $('listaVentas');
   if (ventasHoy.length === 0) { cont.innerHTML = '<div class="vacio">Sin ventas hoy</div>'; return; }
   const total = ventasHoy.reduce((s, v) => s + v.total, 0);
-  
   cont.innerHTML = ventasHoy.slice().reverse().map(v => {
     const h = new Date(v.fecha);
     const hora = h.getHours().toString().padStart(2,'0') + ':' + h.getMinutes().toString().padStart(2,'0');
@@ -536,48 +487,10 @@ function renderVentas() {
     </div>`;
 }
 
-function generarPDFVentas() {
-  const { jsPDF } = window.jspdf;
-  const doc = new jsPDF();
-  
-  doc.setFillColor(21, 101, 192);
-  doc.rect(0, 0, 210, 40, 'F');
-  doc.setTextColor(255, 255, 255);
-  doc.setFontSize(22);
-  doc.text("Mi Abarrotes - Corte de Caja", 105, 20, { align: "center" });
-  doc.setFontSize(12);
-  doc.text("Reporte generado el: " + new Date().toLocaleString(), 105, 30, { align: "center" });
-  
-  let rows = [];
-  ventasHoy.forEach(v => {
-    const hora = new Date(v.fecha).toLocaleTimeString();
-    const items = v.items.map(i => `${i.cant} ${i.unidad} de ${i.nombre}`).join(', ');
-    rows.push([hora, items, dinero(v.total)]);
-  });
-  
-  const totalDia = ventasHoy.reduce((s, v) => s + v.total, 0);
-  
-  doc.autoTable({
-    startY: 50,
-    head: [['Hora', 'Productos', 'Total']],
-    body: rows,
-    theme: 'striped',
-    headStyles: { fillColor: [66, 165, 245] },
-    styles: { fontSize: 10 },
-    columnStyles: { 0: { cellWidth: 30 }, 1: { cellWidth: 120 }, 2: { cellWidth: 40, halign: 'right' } }
-  });
-  
-  doc.setFontSize(16);
-  doc.setTextColor(21, 101, 192);
-  doc.text(`Total Vendido: ${dinero(totalDia)}`, 190, doc.lastAutoTable.finalY + 15, { align: "right" });
-  
-  return doc;
-}
-
+// --- GENERACIÓN DE PDF Y ENVÍOS (Solo Inventario) ---
 function generarPDFInventario() {
   const { jsPDF } = window.jspdf;
   const doc = new jsPDF();
-  
   doc.setFillColor(21, 101, 192);
   doc.rect(0, 0, 210, 40, 'F');
   doc.setTextColor(255, 255, 255);
@@ -585,9 +498,7 @@ function generarPDFInventario() {
   doc.text("Mi Abarrotes - Inventario", 105, 20, { align: "center" });
   doc.setFontSize(12);
   doc.text("Reporte generado el: " + new Date().toLocaleString(), 105, 30, { align: "center" });
-  
   let rows = productos.map(p => [p.nombre, p.unidad, p.stock, dinero(p.precio), p.codigo || 'N/A']);
-  
   doc.autoTable({
     startY: 50,
     head: [['Producto', 'U.M', 'Stock', 'Precio', 'Código']],
@@ -596,16 +507,13 @@ function generarPDFInventario() {
     headStyles: { fillColor: [66, 165, 245] },
     styles: { fontSize: 10 },
   });
-  
   return doc;
 }
 
 async function enviarCorreo(doc, nombreArchivo, asunto) {
   if (!config.correo) { toast('⚠️ Configura primero el correo en Mantenimiento'); return; }
-  
   toast('📧 Enviando correo...');
   const pdfBase64 = doc.output('datauristring');
-  
   try {
     const res = await fetch("https://formsubmit.co/ajax/" + config.correo, {
       method: "POST",
@@ -622,12 +530,10 @@ async function enviarCorreo(doc, nombreArchivo, asunto) {
   } catch (e) { toast('❌ Error de conexión al enviar correo'); }
 }
 
-function enviarWhatsApp(mensaje, nombreArchivo, doc) {
-  if (!config.whatsapp) { toast('⚠️ Configura primero el WhatsApp en Mantenimiento'); return; }
-  doc.save(nombreArchivo);
-  const url = `https://wa.me/${config.whatsapp}?text=${encodeURIComponent(mensaje)}`;
-  window.open(url, '_blank');
-  toast('📱 PDF descargado. Adjúntalo en WhatsApp.');
+function enviarInventario() {
+  const doc = generarPDFInventario();
+  const fecha = new Date().toISOString().slice(0,10);
+  enviarCorreo(doc, `Inventario_${fecha}.pdf`, `Inventario de Productos - ${fecha}`);
 }
 
 function cerrarDia() {
@@ -636,24 +542,13 @@ function cerrarDia() {
   if (pin !== "1234" && pin !== "9999") { if(pin !== null) toast('❌ PIN incorrecto'); return; }
   
   const total = ventasHoy.reduce((s, v) => s + v.total, 0);
-  if (!confirm(`¿Cerrar el día?\n\nTotal vendido: ${dinero(total)}`)) return;
+  if (!confirm(`¿Cerrar el día?\n\nTotal vendido: ${dinero(total)}\nSe borrará el historial de ventas.`)) return;
   
-  const doc = generarPDFVentas();
-  const fecha = new Date().toISOString().slice(0,10);
-  
-  enviarCorreo(doc, `Corte_${fecha}.pdf`, `Corte de Caja - ${fecha}`);
-  enviarWhatsApp(`*Corte de Caja - ${fecha}*\nTotal Vendido: ${dinero(total)}`, `Corte_${fecha}.pdf`, doc);
-  
+  // Ya no se envía PDF por correo ni WhatsApp aquí. Solo se reinicia.
   ventasHoy = []; 
   guardar(); 
   renderVentas(); 
-  toast('📊 Día cerrado y reportes generados');
-}
-
-function enviarInventario() {
-  const doc = generarPDFInventario();
-  const fecha = new Date().toISOString().slice(0,10);
-  enviarCorreo(doc, `Inventario_${fecha}.pdf`, `Inventario de Productos - ${fecha}`);
+  toast('📊 Día cerrado y reiniciado');
 }
 
 function guardarConfiguracion() {
@@ -691,7 +586,7 @@ function procesarCodigoEscaneado(codigo) {
   } else if (modoCamara === 'venta') {
     const prod = productos.find(p => p.codigo === codigo);
     if (prod) {
-      seleccionarProducto(prod.id); // Llama a la función que decide si pide cantidad o no
+      seleccionarProducto(prod.id);
     } else {
       toast('❌ Código no registrado');
     }
